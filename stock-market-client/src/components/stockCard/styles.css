@@ -1,22 +1,25 @@
 .stockCard{
     display: flex;
-    flex-direction: column;
-    align-items: space-between;
-    justify-content: start;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
     width: 80vw;
     height: auto;
     background-color: #fff;
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 10px rgba(163, 151, 151, 0.3);
     margin: 10px;
     padding:  1rem 2rem;
 }
 
 .stockCard h1{
-    padding: 0;
-    margin: 0 0 1rem 0;
+    font-size: 1.9em;
+    align-self: start;
     font-weight: 700;
-    font-size: 2.5em;
+    text-transform: uppercase;
+    margin: 0 0 1rem 0;
+    font-family: 'Merriweather', serif;
+    font-style: italic;
 }
 
 .stockCard ul{
@@ -28,6 +31,25 @@
 }
 
 .stockCard li{
-    font-size: 1.5em;
-    font-weight: 600;
+    font-size: 1.2em;
+    font-weight: 500;
+}
+
+.stockCard button{
+    background-color: white;
+    border: 3px solid #3fa24f;
+    padding: 0.5rem 1.5rem;
+    border-radius: 1rem;
+    font-size: 1.3em;
+    cursor: pointer;
+    font-family: 'Inter', serif;
+    font-weight: 700;
+    color: #3fa24f;
+    box-shadow: none;
+    text-transform: capitalize;
+}
+
+.stockCard button:hover{
+    background-color: #3fa24f;
+    color: white;
 }

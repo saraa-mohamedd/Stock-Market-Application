@@ -1,23 +1,29 @@
 .siteTitle{
     font-size: 2.75em;
     font-weight:800;
+    display: flex;
+    flex-direction: row;
+    gap: 0.4rem;
     color: #000;
     text-decoration: none;
-    text-shadow: 2px -1px  rgba(61, 50, 50, 0.4);
+    /* text-shadow: 2px -1px  rgba(61, 50, 50, 0.4); */
     margin: 0;
     padding: 0;
-    display: inline-block;
     align-self: center;
+    font-family: 'Merriweather', sans-serif;
+    font-weight: 900;
+    color: white;
 }
 
 .navbar{
-    background-color: #fff;
+    background-color: #002349;
     box-shadow: 0 0 10px 0 rgba(0,0,0,0.1);
     display: flex;
     justify-content: space-between;
     align-items: stretch;
     padding: 0rem 1.5rem;
     height: 5rem;
+    color: white;
 }
 
 .navbar li{
@@ -31,11 +37,13 @@
     display: flex;
     padding: 0;
     margin: 0;
+    align-items: center;
     gap: 1rem;
 }
 
 .navbar li a{
     color: inherit;
+    font-family: 'Merriweather', sans-serif;
     text-decoration: none;
     height: 100%;
     display: flex;
@@ -47,13 +55,22 @@
 
 
 .navbar li.active{
-    color: #000;
+    color: #E5EDF1;
     /* background-color: azure; */
-    border-bottom: 3px solid #000;
+    border-bottom: 3px solid #E5EDF1;
 }
 
 .navbar li:hover{
     color: #000;
-    background-color: lightgrey;
+    background-color: #E5EDF1;
     cursor: pointer;
+}
+
+.logout-icon{
+    color: white;
+    cursor: pointer;
+}
+
+.logout-icon:hover{
+    color: #E5EDF1;
 }

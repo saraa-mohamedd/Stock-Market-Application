@@ -5,10 +5,10 @@ using namespace web;
 using namespace web::http;
 using namespace web::http::experimental::listener;
 
-class StockServer {
+class StockService {
 public:
-    StockServer() : listener_(uri(U("http://localhost:8080"))) {
-        listener_.support(methods::GET, std::bind(&StockServer::handle_get, this, std::placeholders::_1));
+    StockService() : listener_(uri(U("http://localhost:8080"))) {
+        listener_.support(methods::GET, std::bind(&StockService::handle_get, this, std::placeholders::_1));
     }
 
     void start() {
@@ -26,7 +26,7 @@ private:
 };
 
 int main() {
-    StockServer server;
+    StockService server;
     server.start();
 
     while (true) {
