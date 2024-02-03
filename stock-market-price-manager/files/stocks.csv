@@ -1,0 +1,13 @@
+company,price,remainingShares,percent_per_sell,percent_per_buy
+AAPL,120.981,10,0.5,0.8,
+
+GOOGL,13433.750,0,0.9,1.5,
+
+TSLA,122.096,1,1.2,1.8,
+
+AMZN,381.937,3,1.5,2.1,
+
+FB,142.046,6,2.3,0.9,
+
+MSFT,165.657,7,0.8,1.3,
+

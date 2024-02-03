@@ -78,6 +78,18 @@
         "xtr1common": "cpp",
         "xtree": "cpp",
         "xutility": "cpp",
-        "condition_variable": "cpp"
+        "condition_variable": "cpp",
+        "csignal": "cpp",
+        "any": "cpp",
+        "bitset": "cpp",
+        "codecvt": "cpp",
+        "complex": "cpp",
+        "set": "cpp",
+        "cinttypes": "cpp",
+        "typeindex": "cpp",
+        "variant": "cpp",
+        "__nullptr": "cpp",
+        "*.dat": "cpp",
+        "filesystem": "cpp"
     }
 }

@@ -44,9 +44,8 @@ int main() {
                 std::stringstream s;
                 s << std::fixed << std::setprecision(3) << std::stod(row[1]);
                 row[1] = s.str();
+                stocksInfo.push_back(std::move(row));
             }
-
-            stocksInfo.push_back(std::move(row));
             rowNum++;
         }
 
@@ -59,7 +58,7 @@ int main() {
             return 1;
         }
 
-        output_file << "company,price,remainingShares,percent_per_sell,percent_per_buy";
+        output_file << "company,price,remainingShares,percent_per_sell,percent_per_buy\n";
 
         for (const std::vector<std::string>& row : stocksInfo) {
             for (const std::string& value : row) {
