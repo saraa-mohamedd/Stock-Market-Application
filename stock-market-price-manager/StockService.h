@@ -20,6 +20,9 @@ class StockService {
         StockService();
         void start();
 
+        //method for periodic stock price update
+        void randomUpdateStocks();
+
     private:
         //database and listener
         Database db_;

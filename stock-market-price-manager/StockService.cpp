@@ -161,6 +161,8 @@ json::value StockService::buyStock(std::string email, std::string company){
         response[U("message")] = json::value::string(U("Company not found"));
     }
 
+    response[U("stocks")] = getUserStocks(email)[U("stocks")];
+
     return response;
 }
 
@@ -210,6 +212,8 @@ json::value StockService::sellStock(std::string email, std::string company){
         response[U("message")] = json::value::string(U("Stock not found"));
     }
 
+    response[U("stocks")] = getUserStocks(email)[U("stocks")];
+
     return response;
 }
 
@@ -235,6 +239,39 @@ json::value StockService::getUserStocks(std::string email){
     }
 
     return response;
+}
+
+void StockService::randomUpdateStocks(){
+
+    std::string sqlQuery = "SELECT * FROM stockmarket.stocks";
+    sql::ResultSet* res;
+    
+    try{
+        res = db_.executeSelect(sqlQuery);
+    }
+    catch(const std::exception& e){
+        std::cerr << e.what() << std::endl;
+        throw e;
+    }
+
+    while (res->next()){
+        std::string company = res->getString("company");
+        double price = res->getDouble("price");
+
+        double random = ((double) rand() / (RAND_MAX)) * 0.2 - 0.1;
+        price = price + price * random;
+        std::stringstream s;
+        s << std::fixed << std::setprecision(3) << price;
+        price = std::stod(s.str());
+
+        sqlQuery = "UPDATE stockmarket.stocks SET price = " + std::to_string(price) + " WHERE company = '" + company + "'";
+        try{
+            db_.executeQuery(sqlQuery);
+        }
+        catch(const std::exception& e){
+            std::cerr << e.what() << std::endl;
+        }
+    }
 }
 
 // g++ -Wall -I/usr/include/cppconn main.cpp -lcpprest -lssl -lcrypto -L/usr/lib -lmysqlcppconn
