@@ -74,7 +74,7 @@ export default function UserLogin(){
         <ProvideAuth>
             <ProvideServer>
         <div className="login-wrapper">
-            <h2><span>{action}</span> to QuickStock</h2>
+            <h2><span className="highlight">{action}</span> to QuickStock</h2>
             <div className="underline"></div>
             {/* <LoginForm handleLogin={handleLogin} /> */}
             <div className = "inputs">
@@ -90,8 +90,8 @@ export default function UserLogin(){
                     <RiLockPasswordFill size={20}/>
                     <input type="password" placeholder="Password" onChange={(event)=>setPassword(event.target.value)} />
                     </div>
-            </div>
             {action ==="Sign Up"? <div></div> : <div className="forgot-password">Forgot Password? <span>Click Here!</span></div>}
+            </div>
             <div className="submit-container">
                 <div className={action==="Log In" ?"submit inactive" : "submit"} onClick={handleRegister}>Sign Up</div>
                 {/* send content of inputs to the handleLogin function... */}

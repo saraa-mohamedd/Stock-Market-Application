@@ -10,7 +10,12 @@ export default function Stocks() {
     console.log(token);
 
     if (!token) {
-        return UserLogin();
+        return (
+            <div className="stockpage-wrapper">
+                <h2>Please <span className="highlight">sign up</span> or <span class="highlight">log in</span> to access this page</h2>
+                <UserLogin />
+            </div>
+        )
     }
     return (
         <>

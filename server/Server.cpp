@@ -58,6 +58,9 @@ void Server::handleMessage(websocketpp::connection_hdl hdl, server::message_ptr 
             json::value response = getUserDetails(req);
             m_server.send(hdl, response.serialize(), msg->get_opcode());
         }
+        else{
+            std::cout << "Invalid function" << std::endl;
+        }
     } else if(msg->get_opcode() == websocketpp::frame::opcode::binary) {
         std::cout << "Received binary message" << std::endl;
     }
