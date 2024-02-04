@@ -6,6 +6,7 @@ export const ServerContext = createContext();
 
 export const ProvideServer = ({ children }) => {
     const [ws, setWs] = useState(null);
+    const [connected, setConnected] = useState(false);
    
     useEffect(() => {
        setWs(new WebSocket('ws://localhost:9002'));
@@ -20,12 +21,8 @@ export const ProvideServer = ({ children }) => {
    
        ws.onopen = () => {
          console.log('connected');
+         setConnected(true);
        };
-   
-    //    ws.onmessage = evt => {
-    //      console.log('Received: ' + evt.data);
-    //      return evt.data;
-    //    };
    
        ws.onerror = error => {
          console.log('WebSocket Error: ' + error);
@@ -38,7 +35,7 @@ export const ProvideServer = ({ children }) => {
 
 
     return (
-        <ServerContext.Provider value={{ ws }}>
+        <ServerContext.Provider value={{ ws, connected }}>
             {children}
         </ServerContext.Provider>
     )

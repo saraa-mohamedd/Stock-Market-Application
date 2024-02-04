@@ -1,4 +1,4 @@
-.loginWrapper{
+.login-wrapper{
     display: flex;
     justify-content: center;
     align-items: center;
@@ -6,14 +6,15 @@
     flex-direction: column;
     padding: 1rem 2rem;
     margin: 2rem;
+    width: 25vw;
 }
 
-.loginWrapper span{
+.login-wrapper span{
     color: #002349;
     font-family: 'Merriweather', sans-serif;
 }
 
-.loginWrapper h2{
+.login-wrapper h2{
     font-size: 1.5em;
     align-self: center;
     font-weight: 700;

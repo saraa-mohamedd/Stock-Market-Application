@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { useAuth } from '../../context/AuthContext.js';
+import { ProvideAuth, useAuth } from '../../context/AuthContext.js';
 import {FaUser} from 'react-icons/fa';
 import {MdMail} from 'react-icons/md';
 import {RiLockPasswordFill} from 'react-icons/ri';
-import { useServer } from '../../context/ServerContext.js';
+import { ProvideServer, useServer } from '../../context/ServerContext.js';
 import { useEffect } from 'react';
 import './styles.css';
 
@@ -54,9 +54,7 @@ export default function UserLogin(){
 
     useEffect(() => {
         if (ws){
-
             console.log('ws: ', ws);
-    
             ws.onmessage = evt => {
                 evt = JSON.parse(evt.data);
                 console.log("evt: ", evt);
@@ -64,26 +62,18 @@ export default function UserLogin(){
                     console.log('Logged in');
                     setAuth(evt["data"]["email"]);
                     setToken(evt["data"]["email"]);
+                    window.location.reload();
                 }
                 console.log('Received: ' + JSON.stringify(evt));
-                // window.location.reload();
             }
 
         }
      }, [ws]);
 
-    //  // use effect for when token changes
-    // useEffect(() => {
-    //     if (!token) return;
-
-        
-    //     console.log('Token: ', token);
-    // }, [token]);
-
-
     return (
-        <>
-        <div className="loginWrapper" id="login-box">
+        <ProvideAuth>
+            <ProvideServer>
+        <div className="login-wrapper">
             <h2><span>{action}</span> to QuickStock</h2>
             <div className="underline"></div>
             {/* <LoginForm handleLogin={handleLogin} /> */}
@@ -108,6 +98,7 @@ export default function UserLogin(){
                 <div className={action==="Log In" ?"submit" : "submit inactive"} onClick={handleLogin}>Log In</div>
             </div>
         </div>
-        </>
+        </ProvideServer>
+        </ProvideAuth>
     );
 }

@@ -2,48 +2,66 @@ import './styles.css';
 import { AiFillDollarCircle } from 'react-icons/ai';
 import UserLogin from '../../components/userLogin/UserLogin';
 import { ProvideAuth, useAuth } from '../../context/AuthContext';
-// import { useEffect, useState } from 'react';
 import { ProvideServer, useServer } from '../../context/ServerContext';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 
 const Home = () => {
-    const {ws} = useServer();
+    const {ws, connected} = useServer();
     const {token} = useAuth();
-
-    //set token to change automatically when user logs in
-    
+    const [name, setName] = useState('');
 
     useEffect(() => {
-        if (!ws) return;
-        ws.onmessage = evt => {
-            console.log('Received: ' + evt.data);
+        let request = {};
+        if (token){
+            request = {
+                "fun": "getdetails",
+                "data": {
+                    "email": token
+                }
+            }
+            console.log('request: ', request);
         }
-     }, [ws]);
 
-    //  useEffect(() => {
-    //     if (!token) return;
-    //     document.getElementById("login-register-box").innerHTML = `<p>Logged in as ${token}</p>`;
+        if (ws && connected){
+            ws.send(JSON.stringify(request));  
+            console.log('ws: ', ws);
+
+            ws.onmessage = evt => {
+                evt = JSON.parse(evt.data);
+                console.log("evt: ", evt);
+                if (evt["fun"] == "getdetails" && evt["status"] == "success") {
+                    console.log('got user details');
+                    setName(evt["data"]["fullname"]);
+                }
+            }
+
+        }
+     }, [ws, token, connected]);
+
+     useEffect(() => {
+        console.log('home sees token change: ', token);
         
-    //  }, [token]);
+        // ws.send(JSON.stringify(request));        
+     }, [token]);
 
         
     return (
-        <div className="homepage-wrapper" id='server-response'>
-            <h1>QuickStock  <AiFillDollarCircle color='#002349' /></h1>
-            <h2>Welcome to the <span className="app-name">future</span> of stock trading.</h2>
-            <p>Stock trading made easy! Just one stop for viewing, buying, and selling stocks</p>
-            <div id="login-register-box">
-            {token ? <p>Logged in as {token}</p> : 
-            <ProvideAuth>
-                <ProvideServer>
-                <UserLogin />
-                </ProvideServer>
-            </ProvideAuth>}
-            </div>
-            <button onClick={() => ws.send('Hello, Server!')}>Send</button>
-            <h1 id="server-response">${}</h1>
-        </div>
+        <ProvideAuth>
+            <ProvideServer>
+                <div className="homepage-wrapper" id='server-response'>
+                    <h1>QuickStock  <AiFillDollarCircle color='#002349' /></h1>
+                    <h2>Welcome to the <span className="app-name">future</span> of stock trading.</h2>
+                    <p>Stock trading made easy! Just one stop for viewing, buying, and selling stocks</p>
+                    <div id="login-register-box">
+                        {token ? <p>Logged in as {name}</p> : 
+                            <UserLogin />}
+                    </div>
+                    <h1 id="server-response">${}</h1>
+                </div>
+            </ProvideServer>
+        </ProvideAuth>
+        
     )
 }
 

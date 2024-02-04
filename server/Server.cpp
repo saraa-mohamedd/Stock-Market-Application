@@ -54,6 +54,10 @@ void Server::handleMessage(websocketpp::connection_hdl hdl, server::message_ptr 
             json::value response = handleRegister(req);
             m_server.send(hdl, response.serialize(), msg->get_opcode());
         }
+        else if (req.at("fun").as_string() == "getdetails") {
+            json::value response = getUserDetails(req);
+            m_server.send(hdl, response.serialize(), msg->get_opcode());
+        }
     } else if(msg->get_opcode() == websocketpp::frame::opcode::binary) {
         std::cout << "Received binary message" << std::endl;
     }
@@ -147,6 +151,39 @@ json::value Server::handleRegister(json::value registerdetails) {
     response[U("data")] = json::value::object();
     response[U("fun")] = json::value::string("register");
 
+    delete res;
+    return response;
+}
+
+json::value Server::getUserDetails(json::value email) {
+    std::string email_ = email.at("data").at("email").as_string();
+    std::string query = "SELECT * FROM stockmarket.users WHERE email = '" + email_ + "'";
+    sql::ResultSet* res;
+
+    try{
+        res = db_.executeSelect(query);
+    }
+    catch(const std::exception& e){
+        std::cerr << e.what() << std::endl;
+        throw e;
+    }
+
+    json::value response;
+    if(res->next()) {
+        json::value data;
+        data[U("fullname")] = json::value::string(U(res->getString("fullName")));
+        data[U("email")] = json::value::string(email_);
+
+        response[U("status")] = json::value::string("success");
+        response[U("message")] = json::value::string("User details found!");
+        response[U("data")] = data;
+        response[U("fun")] = json::value::string("getdetails");
+    } else {
+        response[U("status")] = json::value::string("failure");
+        response[U("message")] = json::value::string("User details not found!");
+        response[U("data")] = json::value::object();
+        response[U("fun")] = json::value::string("getdetails");
+    }
     delete res;
     return response;
 }

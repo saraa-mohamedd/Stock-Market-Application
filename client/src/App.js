@@ -17,7 +17,7 @@ function App() {
         <div className='container'>
             <ProvideAuth>
               <Routes>
-                <Route path="/" element={<Home />} />
+                <Route path="/" element={<ProvideAuth><ProvideServer><Home /></ProvideServer></ProvideAuth>} />
                 <Route path="/stocks" element={<Stocks />} />
                 <Route path="/wallet" element={<Wallet />} />
               </Routes>
