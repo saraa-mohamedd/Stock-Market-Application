@@ -11,20 +11,20 @@ import './styles/globalstyles.css';
 function App() {
   return (
     <>
-    <ProvideAuth>
-    <NavBar />
-    <div className='container'>
+    <ProvideServer>
       <ProvideAuth>
-        <ProvideServer>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/stocks" element={<Stocks />} />
-        <Route path="/wallet" element={<Wallet />} />
-      </Routes>
-      </ProvideServer>
+        <NavBar />
+        <div className='container'>
+            <ProvideAuth>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/stocks" element={<Stocks />} />
+                <Route path="/wallet" element={<Wallet />} />
+              </Routes>
+            </ProvideAuth>
+        </div>
       </ProvideAuth>
-    </div>
-    </ProvideAuth>
+    </ProvideServer>
     </>
   );
 }

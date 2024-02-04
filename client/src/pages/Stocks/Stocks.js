@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import StockCard from '../../components/stockCard/stockCard.js'
 import './styles.css'
 
@@ -8,12 +8,33 @@ export default function Stocks() {
     const { token } = useAuth();
     console.log(token);
 
-    if (!token) {
-        return <p>Please log in.</p>;
-    }
+    const [loggedIn, setloggedIn] = useState(false);
+    useEffect(() => {
+        if (!token) {
+            setloggedIn(false);
+        }
+        else{
+            setloggedIn(true);
+        }
+        // ws.onmessage = evt => {
+        //     console.log('Received: ' + evt.data);
+        //     document.getElementById('server-response').innerHTML = evt.data;
+        // }
+     }, [token]);
+
+     useEffect(() => {
+        if (loggedIn) {
+            return;
+            // ws.send('Hello, Server!');
+        }
+        else {
+            document.getElementById('stockpage-wrapper').innerHTML = 'Please log in to view stocks';
+        }
+     }, [loggedIn]);
+
     return (
         <>
-        <div className="stockpage-wrapper">
+        <div className="stockpage-wrapper" id="stockpage-wrapper">
             <h2>View and purchase stocks here! With real-time stock price updates, monitor the market and make <span className="highlight"> informed decisions. </span></h2>
             <div className='stocks-container'>
                 <StockCard name='AAPL' price='100' shares='10' />
