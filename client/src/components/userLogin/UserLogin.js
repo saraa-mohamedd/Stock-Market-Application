@@ -16,13 +16,13 @@ export default function UserLogin(){
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
+    const [message, setMessage] = useState(''); // message to display to user
 
     const handleLogin = async () => {
         if (action === "Sign Up") {
             setAction('Log In');
             return;
         }
-
         let request = {
             "fun": "login",
             "data": {
@@ -30,7 +30,6 @@ export default function UserLogin(){
                 "password": password
             }
         }
-
         ws.send(JSON.stringify(request));
     };
 
@@ -39,7 +38,6 @@ export default function UserLogin(){
             setAction('Sign Up');
             return;
         }
-
         let request = {
             "fun": "register",
             "data": {
@@ -48,7 +46,6 @@ export default function UserLogin(){
                 "fullname": name
             }
         }
-
         ws.send(JSON.stringify(request));
     }
 
@@ -58,11 +55,39 @@ export default function UserLogin(){
             ws.onmessage = evt => {
                 evt = JSON.parse(evt.data);
                 console.log("evt: ", evt);
-                if (evt["fun"] == "login" && evt["status"] == "success") {
-                    console.log('Logged in');
-                    setAuth(evt["data"]["email"]);
-                    setToken(evt["data"]["email"]);
-                    window.location.reload();
+                if (evt["fun"] == "login"){
+                    if (evt["status"] == "success") {
+                        console.log('Logged in');
+                        setAuth(evt["data"]["email"]);
+                        setToken(evt["data"]["email"]);
+                        window.location.reload();
+                    }
+                    else {
+                        // set and display error message
+                        setMessage(evt["message"]);
+                        document.getElementById("message-box").classList.remove("no-message");
+                        document.getElementById("message-box").classList.remove("success");
+                        document.getElementById("message-box").classList.add("error");
+                    }
+                }
+                else if (evt["fun"] == "register"){
+                    if (evt["status"] == "success") {
+                        console.log('Registered');
+
+                        // set and display success message
+                        setMessage(evt["message"]);
+                        document.getElementById("message-box").classList.remove("no-message");
+                        document.getElementById("message-box").classList.remove("error");
+                        document.getElementById("message-box").classList.add("success");
+                    }
+                    else {
+
+                        // set and display error message
+                        setMessage(evt["message"]);
+                        document.getElementById("message-box").classList.remove("no-message");
+                        document.getElementById("message-box").classList.remove("success");
+                        document.getElementById("message-box").classList.add("error");
+                    }
                 }
                 console.log('Received: ' + JSON.stringify(evt));
             }
@@ -76,7 +101,6 @@ export default function UserLogin(){
         <div className="login-wrapper">
             <h2><span className="highlight">{action}</span> to QuickStock</h2>
             <div className="underline"></div>
-            {/* <LoginForm handleLogin={handleLogin} /> */}
             <div className = "inputs">
                 {action ==="Log In"? <div></div> : <div className = "input">
                     <FaUser size={20}/>
@@ -94,9 +118,11 @@ export default function UserLogin(){
             </div>
             <div className="submit-container">
                 <div className={action==="Log In" ?"submit inactive" : "submit"} onClick={handleRegister}>Sign Up</div>
-                {/* send content of inputs to the handleLogin function... */}
                 <div className={action==="Log In" ?"submit" : "submit inactive"} onClick={handleLogin}>Log In</div>
             </div>
+        </div>
+        <div id="message-box" className="no-message" >
+            {message}
         </div>
         </ProvideServer>
         </ProvideAuth>
