@@ -1,8 +1,6 @@
 #pragma once
 
 #include "StockService.h"
-#include <iostream>
-
 
 StockService::StockService() : listener_(uri(U("http://localhost:8080"))), db_("localhost:3306", "root", "password", "stockmarket") {
     listener_.support(methods::GET, std::bind(&StockService::handle_get, this, std::placeholders::_1));
@@ -92,6 +90,29 @@ void StockService::handle_post(http_request request) {
         });
     }
     else{
+        request.reply(http::status_codes::NotFound);
+    }
+}
+
+void StockService::handle_delete(http_request request) {
+    auto path = request.relative_uri().path();
+    auto params = request.absolute_uri().split_query(request.relative_uri().query());
+    json::value response;
+
+    if (path == U("/sellstock")) {
+        request.extract_json().then([this, request](json::value jvalue) {
+            try{
+            json::value response;
+            response = sellStock(jvalue[U("email")].as_string(), jvalue[U("company")].as_string());
+            request.reply(http::status_codes::OK, response);
+        }
+        catch(const std::runtime_error& e){
+            std::cerr << e.what() << std::endl;
+            request.reply(http::status_codes::ExpectationFailed, e.what());
+        }
+        });
+    }
+    else {
         request.reply(http::status_codes::NotFound);
     }
 }

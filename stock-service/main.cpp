@@ -1,4 +1,3 @@
-#include "deps.cpp"
 #include "StockService.h"
 #include "StockService.cpp"
 
@@ -24,7 +23,7 @@ int main() {
     }
 
     //join the thread t with main thread 
-    //(will never be executed in this case,but it's a good practice to join the thread with main thread)
+    //(will never be executed in this case, but it's a good practice to join the thread with main thread)
     t.join();
     return 0;
 }

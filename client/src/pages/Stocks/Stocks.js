@@ -13,9 +13,9 @@ export default function Stocks() {
     }
     return (
         <>
-        <div className="stockpageWrapper">
+        <div className="stockpage-wrapper">
             <h2>View and purchase stocks here! With real-time stock price updates, monitor the market and make <span className="highlight"> informed decisions. </span></h2>
-            <div className='stocksWrapper'>
+            <div className='stocks-container'>
                 <StockCard name='AAPL' price='100' shares='10' />
                 <StockCard name='Tesla' price='200' shares='5' />
                 <StockCard name='Microsoft' price='150' shares='7' />

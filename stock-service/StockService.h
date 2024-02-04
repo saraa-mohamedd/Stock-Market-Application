@@ -9,7 +9,7 @@
 #include <iomanip>
 #include <string>
 #include <filesystem>
-#include "Database.cpp"
+#include "Database.h"
 
 using namespace web;
 using namespace web::http;
@@ -37,6 +37,7 @@ class StockService {
         //handlers for the HTTP requests
         void handle_get(http_request request);
         void handle_post(http_request request);
+        void handle_delete(http_request request);
 };
 
 #endif
