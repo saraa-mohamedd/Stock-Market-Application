@@ -4,17 +4,21 @@ import UserLogin from '../../components/userLogin/UserLogin';
 import { ProvideAuth, useAuth } from '../../context/AuthContext';
 // import { useEffect, useState } from 'react';
 import { useServer } from '../../context/ServerContext';
+import { useEffect } from 'react';
 
 
 const Home = () => {
     const {ws} = useServer();
     const {token} = useAuth();
-
-    // render tje text from the server
-    ws.onmessage = evt => {
-        console.log('Received: ' + evt.data);
-        document.getElementById('server-response').innerHTML = evt.data;
-    };
+    
+    useEffect(() => {
+        if (!ws) return;
+        ws.onmessage = evt => {
+            console.log('Received: ' + evt.data);
+            document.getElementById('server-response').innerHTML = evt.data;
+        }
+     }, [ws]);
+        
     return (
         <div className="homepage-wrapper">
             <h1>QuickStock  <AiFillDollarCircle color='#002349' /></h1>

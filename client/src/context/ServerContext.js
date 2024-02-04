@@ -22,10 +22,10 @@ export const ProvideServer = ({ children }) => {
          console.log('connected');
        };
    
-       ws.onmessage = evt => {
-         console.log('Received: ' + evt.data);
-         return evt.data;
-       };
+    //    ws.onmessage = evt => {
+    //      console.log('Received: ' + evt.data);
+    //      return evt.data;
+    //    };
    
        ws.onerror = error => {
          console.log('WebSocket Error: ' + error);
