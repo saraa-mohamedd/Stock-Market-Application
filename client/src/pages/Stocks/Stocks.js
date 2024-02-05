@@ -81,7 +81,7 @@ export default function Stocks() {
                         return (
                             <ProvideAuth>
                                 <ProvideServer>
-                                    <StockCard key={stock.company} name={stock.company} price={stock.price} shares={stock.remainingShares} />
+                                    <StockCard key={stock.company} type={"buy"} name={stock.company} price={stock.price} shares={stock.remainingShares} />
                                 </ProvideServer>
                             </ProvideAuth>
                         )

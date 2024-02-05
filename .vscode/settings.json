@@ -90,6 +90,10 @@
         "variant": "cpp",
         "__nullptr": "cpp",
         "*.dat": "cpp",
-        "filesystem": "cpp"
+        "filesystem": "cpp",
+        "*.ipp": "cpp",
+        "coroutine": "cpp",
+        "source_location": "cpp",
+        "future": "cpp"
     }
 }

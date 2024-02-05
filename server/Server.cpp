@@ -64,8 +64,16 @@ void Server::handleMessage(websocketpp::connection_hdl hdl, server::message_ptr 
             response = getStocksInfo();
             m_server.send(hdl, response.serialize(), msg->get_opcode());
         }
+        else if (req.at("fun").as_string() == "getuserstocks"){
+            response = getUserStocks(req);
+            m_server.send(hdl, response.serialize(), msg->get_opcode());
+        }
         else if (req.at("fun").as_string() == "buystock"){
             response = buyStock(req);
+            m_server.send(hdl, response.serialize(), msg->get_opcode());
+        }
+        else if (req.at("fun").as_string() == "sellstock"){
+            response = sellStock(req);
             m_server.send(hdl, response.serialize(), msg->get_opcode());
         }
         else{
@@ -234,7 +242,6 @@ json::value Server::buyStock(json::value buydetails){
 
         http_response resp = client.request(req).get();
         apiresponse = resp.extract_json().get();
-        std::cout << "===============================================================================API response to buystock: " << apiresponse << std::endl;
     }
     catch(const std::exception& e){
         std::cerr << e.what() << std::endl;
@@ -259,7 +266,10 @@ json::value Server::sellStock(json::value selldetails){
     http_client client(U("http://localhost:8080/sellstock"));
     json::value apiresponse;
     try{
-        http_response res = client.request(methods::POST, selldetails.as_string()).get();
+        http_request req(methods::POST);
+        req.set_body(selldetails.at("data"));
+
+        http_response res = client.request(req).get();
         apiresponse = res.extract_json().get();
     }
     catch(const std::exception& e){
@@ -279,4 +289,47 @@ json::value Server::sellStock(json::value selldetails){
     response[U("fun")] = json::value::string("sellstock");
 
     return response;
+}
+
+json::value Server::getUserStocks(json::value email){
+    http_client client(U("http://localhost:8080/userstocks/?email=" + email.at("data").at("email").as_string()));
+    json::value apiresponse;
+
+    try{
+        http_request req(methods::GET);
+        // req.set_request_uri(U("/endpoint?param1=value1&param2=value2"));
+        // req.headers().add(U("email"), email.at("data").at("email").as_string());
+        std::cout << "Request at TCP: " << req.to_string() << std::endl;
+        http_response res = client.request(req).get();
+
+        try{
+            apiresponse = res.extract_json().get();
+        }
+        catch(const std::exception& e){
+            json::value response;
+            response[U("status")] = json::value::string("failure");
+            response[U("message")] = json::value::string("Failed to sell stock!");
+            response[U("data")] = json::value::object();
+            response[U("fun")] = json::value::string("sellstock");
+            return response;
+        }
+    }
+    catch(const std::exception& e){
+        std::cerr << e.what() << std::endl;
+        json::value response;
+        response[U("status")] = json::value::string("failure");
+        response[U("message")] = json::value::string("Failed to sell stock!");
+        response[U("data")] = json::value::object();
+        response[U("fun")] = json::value::string("sellstock");
+        return response;
+    }
+
+    json::value response;
+    response[U("status")] = json::value::string("success");
+    response[U("message")] = apiresponse.at("message");
+    response[U("data")][U("stocks")] = apiresponse.at("stocks");
+    response[U("fun")] = json::value::string("getuserstocks");
+
+    return response;
+
 }

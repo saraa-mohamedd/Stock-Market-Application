@@ -21,7 +21,19 @@ void StockService::start() {
 
 void StockService::handle_get(http_request request) {
     auto path = request.relative_uri().path();
-    auto params = request.absolute_uri().split_query(request.relative_uri().query());
+    // auto params = request.absolute_uri().split_query(request.relative_uri().query());
+    auto queries = uri::split_query(uri::decode(request.relative_uri().query()));
+    
+    //remove oart starting from ? in the path
+    if (std::count(path.begin(), path.end(), '/') == 2){
+        path = path.substr(0, path.length() - 1);
+    }
+    for (auto &query : queries)
+    {
+        ucout << query.first << ": " << query.second << std::endl;
+    }
+
+    std::cout << "Path: " << path << std::endl;
     json::value response;
 
     if (path == U("/")) {
@@ -45,7 +57,8 @@ void StockService::handle_get(http_request request) {
     else if (path == U("/userstocks")) {
         try{
             json::value response;
-            std::string email = params["email"];
+            std::string email = queries[U("email")];
+            // std::cout << "params:  " << request.absolute_uri() << std::endl;
             response = getUserStocks(email);
             request.reply(http::status_codes::OK, response);
         }
@@ -279,6 +292,38 @@ json::value StockService::getUserStocks(std::string email){
         response[U("stocks")][response[U("stocks")].size()] = stock;        
     }
 
+    //add remaining shares
+    std::map<std::string, int> stockMap;
+    for (int i = 0; i < response[U("stocks")].size(); i++){
+        std::string company = response[U("stocks")][i][U("company")].as_string();
+        if (stockMap.find(company) == stockMap.end()){
+            stockMap[company] = 1;
+        }
+        else{
+            stockMap[company]++;
+        }
+    }
+
+    for (int i = 0; i < response[U("stocks")].size(); i++){
+        std::string company = response[U("stocks")][i][U("company")].as_string();
+        response[U("stocks")][i][U("remainingShares")] = json::value::string(U(std::to_string(stockMap[company])));
+    }
+
+    //remove duplicate stocks
+    std::vector<std::string> uniqueStocks;
+    for (int i = 0; i < response[U("stocks")].size(); i++){
+        std::string company = response[U("stocks")][i][U("company")].as_string();
+        if (std::find(uniqueStocks.begin(), uniqueStocks.end(), company) == uniqueStocks.end()){
+            uniqueStocks.push_back(company);
+        }
+        else{
+            response[U("stocks")].erase(i);
+            i--;
+        }
+    }
+    
+    response[U("message")] = json::value::string(U("User stocks retrieved successfully"));
+
     delete res;
 
     return response;
@@ -315,6 +360,8 @@ void StockService::randomUpdateStocks(){
             std::cerr << e.what() << std::endl;
         }
     }
+
+    delete res;
 }
 
 // g++ -Wall -I/usr/include/cppconn main.cpp -lcpprest -lssl -lcrypto -L/usr/lib -lmysqlcppconn

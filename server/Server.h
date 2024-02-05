@@ -33,6 +33,7 @@ class Server {
         json::value getStocksInfo();
         json::value buyStock(json::value buydetails);   
         json::value sellStock(json::value selldetails);
+        json::value getUserStocks(json::value email);
     public:
         Server();
         

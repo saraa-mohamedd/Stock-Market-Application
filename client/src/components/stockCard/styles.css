@@ -9,7 +9,7 @@
     box-shadow: 0.5em 0.5em 0.5em rgb(142, 133, 133, 0.2);
     margin: 1rem;
     padding: 2rem 3rem;
-    width: 15%;
+    width: 16rem;
 }
 
 .stockCard h1{
@@ -27,7 +27,7 @@
     display: flex;
     padding: 0;
     margin: 0;
-    gap: 1rem;
+    gap: 0.5rem;
 }
 
 .stockCard li{
@@ -35,7 +35,7 @@
     font-weight: 500;
 }
 
-.stockCard button{
+.buy-button{
     background-color: white;
     border: 3px solid #3fa24f;
     padding: 0.5rem 1.5rem;
@@ -49,7 +49,26 @@
     text-transform: capitalize;
 }
 
-.stockCard button:hover{
+.buy-button:hover{
     background-color: #3fa24f;
+    color: white;
+}
+
+.sell-button{
+    background-color: white;
+    border: 3px solid #b63c3c;
+    padding: 0.5rem 1.5rem;
+    border-radius: 1rem;
+    font-size: 1.3em;
+    cursor: pointer;
+    font-family: 'Inter', serif;
+    font-weight: 700;
+    color: #b63c3c;
+    box-shadow: none;
+    text-transform: capitalize;
+}
+
+.sell-button:hover{
+    background-color: #b63c3c;
     color: white;
 }

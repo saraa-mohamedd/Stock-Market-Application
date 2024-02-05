@@ -22,6 +22,21 @@ export default function StockCard(props) {
             ws.send(JSON.stringify(request));
     }
 
+    const handleSell = () => {
+        let request = {
+            "fun": "sellstock",
+            "data": {
+                "email": token,
+                "company": props.name
+            }
+        }
+        console.log('request: ', request);
+        if (ws && connected){
+            console.log("sending sell request")
+            ws.send(JSON.stringify(request));
+        }
+    }
+
     useEffect(() => {
         if (ws && connected){
             ws.onmessage = evt => {
@@ -30,6 +45,9 @@ export default function StockCard(props) {
                     console.log("evt: ", evt);
                     if (evt["fun"] == "buystock" && evt["status"] == "success") {
                         console.log('bought stock');
+                    }
+                    else if (evt["fun"] == "sellstock" && evt["status"] == "success") {
+                        console.log('sold stock');
                     }
                 }
             }
@@ -45,9 +63,7 @@ export default function StockCard(props) {
                     <li>Shares: {props.shares}</li>
                 </ul>
             </div>
-            <div className="but">
-                <Button onClick={handleBuy} variant="contained" color="primary">Buy Share</Button>
-            </div>
+                <div className={props.type == "buy" ? "buy-button" : "sell-button"} onClick={props.type == "buy" ? handleBuy : handleSell}>{props.type == "buy" ? "Buy Share" : "Sell Share"}</div>
         </div>
     )
 }
