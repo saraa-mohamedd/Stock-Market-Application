@@ -36,3 +36,10 @@
     color: #002349;
     font-family: 'Merriweather', sans-serif;
 }
+
+#login-register-box p{
+    /* ujnderline font */
+    /* border-bottom: 2px solid #002349; */
+    color: #002349;
+    text-decoration: solid underline;
+}

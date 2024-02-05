@@ -16,11 +16,13 @@ function App() {
         <NavBar />
         <div className='container'>
             <ProvideAuth>
-              <Routes>
-                <Route path="/" element={<ProvideAuth><ProvideServer><Home /></ProvideServer></ProvideAuth>} />
-                <Route path="/stocks" element={<Stocks />} />
-                <Route path="/wallet" element={<Wallet />} />
-              </Routes>
+              <ProvideServer>
+                <Routes>
+                  <Route path="/" element={<ProvideAuth><ProvideServer><Home /></ProvideServer></ProvideAuth>} />
+                  <Route path="/stocks" element={<ProvideAuth><ProvideServer><Stocks /></ProvideServer></ProvideAuth>} />
+                  <Route path="/wallet" element={<Wallet />} />
+                </Routes>
+              </ProvideServer>
             </ProvideAuth>
         </div>
       </ProvideAuth>

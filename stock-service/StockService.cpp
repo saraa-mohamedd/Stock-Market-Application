@@ -67,6 +67,7 @@ void StockService::handle_post(http_request request) {
         request.extract_json().then([this, request](json::value jvalue) {
             try{
             json::value response;
+            std::cout << "body: " << jvalue << std::endl;
             response = buyStock(jvalue[U("email")].as_string(), jvalue[U("company")].as_string());
             request.reply(http::status_codes::OK, response);
         }
@@ -118,7 +119,7 @@ void StockService::handle_delete(http_request request) {
 }
 
 json::value StockService::getStocksInfo(){
-    std::string sqlQuery = "SELECT * FROM stockmarket.stocks";
+    std::string sqlQuery = "SELECT * FROM stockmarket.stocks WHERE remainingShares > 0";
     sql::ResultSet* res = db_.executeSelect(sqlQuery);
     
     json::value response;
@@ -139,6 +140,10 @@ json::value StockService::getStocksInfo(){
 }
 
 json::value StockService::buyStock(std::string email, std::string company){
+
+    std::cout<< "Buying stock" << std::endl;
+    std::cout << "Email: " << email << std::endl;
+    std::cout << "Company: " << company << std::endl;
     std::string sqlQuery = "SELECT * FROM stockmarket.stocks WHERE company = '" + company + "'";
     sql::ResultSet* res = db_.executeSelect(sqlQuery);
     json::value response;
@@ -182,7 +187,7 @@ json::value StockService::buyStock(std::string email, std::string company){
         response[U("message")] = json::value::string(U("Company not found"));
     }
 
-    response[U("stocks")] = getUserStocks(email)[U("stocks")];
+    response[U("stocks")] = getStocksInfo();
 
     return response;
 }
@@ -256,8 +261,25 @@ json::value StockService::getUserStocks(std::string email){
         json::value stock;
         stock[U("company")] = json::value::string(U(res->getString("stockCompany")));
         stock[U("priceBought")] = json::value::string(U(res->getString("priceBought")));
-        response[U("stocks")][response[U("stocks")].size()] = stock;
+
+        sqlQuery = "SELECT * FROM stockmarket.stocks WHERE company = '" + res->getString("stockCompany") + "'";
+        sql::ResultSet* res2;
+
+        try{
+            res2 = db_.executeSelect(sqlQuery);
+        }
+        catch(const std::exception& e){
+            std::cerr << e.what() << std::endl;
+            throw e;
+        }
+        if (res2->next()){
+            stock[U("price")] = json::value::string(U(res2->getString("price")));
+        }
+
+        response[U("stocks")][response[U("stocks")].size()] = stock;        
     }
+
+    delete res;
 
     return response;
 }

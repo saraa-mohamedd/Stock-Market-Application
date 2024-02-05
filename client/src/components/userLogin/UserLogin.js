@@ -53,66 +53,74 @@ export default function UserLogin(){
         if (ws){
             console.log('ws: ', ws);
             ws.onmessage = evt => {
-                evt = JSON.parse(evt.data);
-                console.log("evt: ", evt);
-                if (evt["fun"] == "login"){
-                    if (evt["status"] == "success") {
-                        console.log('Logged in');
-                        setAuth(evt["data"]["email"]);
-                        setToken(evt["data"]["email"]);
-                        window.location.reload();
+                if (evt.data){
+                    evt = JSON.parse(evt.data);
+                    console.log("evt: ", evt);
+                    if (evt["fun"] == "login"){
+                        if (evt["status"] == "success") {
+                            console.log('Logged in');
+                            setAuth(evt["data"]["email"]);
+                            setToken(evt["data"]["email"]);
+                            window.location.reload();
+                        }
+                        else {
+                            // set and display error message
+                            setMessage(evt["message"]);
+                            document.getElementById("message-box").classList.remove("no-message");
+                            document.getElementById("message-box").classList.remove("success");
+                            document.getElementById("message-box").classList.add("error");
+    
+                            document.getElementById("email-input").value = "";
+                            document.getElementById("password-input").value = "";
+    
+                        }
                     }
-                    else {
-                        // set and display error message
-                        setMessage(evt["message"]);
-                        document.getElementById("message-box").classList.remove("no-message");
-                        document.getElementById("message-box").classList.remove("success");
-                        document.getElementById("message-box").classList.add("error");
+                    else if (evt["fun"] == "register"){
+                        if (evt["status"] == "success") {
+                            console.log('Registered');
+    
+                            // set and display success message
+                            setMessage(evt["message"]);
+                            document.getElementById("message-box").classList.remove("no-message");
+                            document.getElementById("message-box").classList.remove("error");
+                            document.getElementById("message-box").classList.add("success");
+                        }
+                        else {
+    
+                            // set and display error message
+                            setMessage(evt["message"]);
+                            document.getElementById("message-box").classList.remove("no-message");
+                            document.getElementById("message-box").classList.remove("success");
+                            document.getElementById("message-box").classList.add("error");
+    
+                            document.getElementById("email-input").value = "";
+                            document.getElementById("password-input").value = "";
+                            document.getElementById("name-input").value = "";
+                        }
                     }
+                    console.log('Received: ' + JSON.stringify(evt));
                 }
-                else if (evt["fun"] == "register"){
-                    if (evt["status"] == "success") {
-                        console.log('Registered');
-
-                        // set and display success message
-                        setMessage(evt["message"]);
-                        document.getElementById("message-box").classList.remove("no-message");
-                        document.getElementById("message-box").classList.remove("error");
-                        document.getElementById("message-box").classList.add("success");
-                    }
-                    else {
-
-                        // set and display error message
-                        setMessage(evt["message"]);
-                        document.getElementById("message-box").classList.remove("no-message");
-                        document.getElementById("message-box").classList.remove("success");
-                        document.getElementById("message-box").classList.add("error");
-                    }
-                }
-                console.log('Received: ' + JSON.stringify(evt));
             }
-
         }
      }, [ws]);
 
     return (
-        <ProvideAuth>
-            <ProvideServer>
+        <>
         <div className="login-wrapper">
             <h2><span className="highlight">{action}</span> to QuickStock</h2>
             <div className="underline"></div>
             <div className = "inputs">
                 {action ==="Log In"? <div></div> : <div className = "input">
                     <FaUser size={20}/>
-                    <input type="text" placeholder="Full Name" onChange={(event)=>setName(event.target.value)}/>
+                    <input type="text" id="name-input" placeholder="Full Name" onChange={(event)=>setName(event.target.value)}/>
                 </div>}
                 <div className = "input">
                     <MdMail size={20}/>
-                    <input type="text" placeholder="Email" onChange={(e)=>setEmail(e.target.value)}/>
+                    <input type="text" id="email-input" placeholder="Email" onChange={(e)=>setEmail(e.target.value)}/>
                 </div>
                 <div className = "input">
                     <RiLockPasswordFill size={20}/>
-                    <input type="password" placeholder="Password" onChange={(event)=>setPassword(event.target.value)} />
+                    <input type="password" id="password-input" placeholder="Password" onChange={(event)=>setPassword(event.target.value)} />
                     </div>
             {action ==="Sign Up"? <div></div> : <div className="forgot-password">Forgot Password? <span>Click Here!</span></div>}
             </div>
@@ -124,7 +132,6 @@ export default function UserLogin(){
         <div id="message-box" className="no-message" >
             {message}
         </div>
-        </ProvideServer>
-        </ProvideAuth>
+        </>
     );
 }

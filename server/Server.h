@@ -30,6 +30,9 @@ class Server {
         json::value handleLogin(json::value logindetails);
         json::value handleRegister(json::value registerdetails);
         json::value getUserDetails(json::value email);
+        json::value getStocksInfo();
+        json::value buyStock(json::value buydetails);   
+        json::value sellStock(json::value selldetails);
     public:
         Server();
         

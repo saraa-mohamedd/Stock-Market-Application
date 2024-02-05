@@ -12,16 +12,18 @@ const Home = () => {
     const [name, setName] = useState('');
 
     useEffect(() => {
+        console.log("ws: ", ws);
         if (ws && connected){
             ws.onmessage = evt => {
-                evt = JSON.parse(evt.data);
-                console.log("evt: ", evt);
-                if (evt["fun"] == "getdetails" && evt["status"] == "success") {
-                    console.log('got user details');
-                    setName(evt["data"]["fullname"]);
+                if (evt.data){
+                    evt = JSON.parse(evt.data);
+                    console.log("evt: ", evt);
+                    if (evt["fun"] == "getdetails" && evt["status"] == "success") {
+                        console.log('got user details');
+                        setName(evt["data"]["fullname"]);
+                    }
                 }
             }
-
         }
      }, [ws, token, connected]);
 

@@ -2,7 +2,7 @@
 
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
-#include <cpprest/http_listener.h>
+#include <cpprest/http_client.h>
 #include <cpprest/json.h>
 #include <cpprest/uri.h>
 #include <thread>
@@ -16,7 +16,7 @@
 
 using namespace web;
 using namespace web::http;
-using namespace web::http::experimental::listener;
+using namespace web::http::client;
 
 
 Server:: Server() : db_("localhost:3306", "root", "password", "stockmarket"){
@@ -35,6 +35,7 @@ void Server::start(uint16_t port) {
     m_server.set_message_handler([this](auto hdl, auto msg) {
         this->handleMessage(hdl, msg);
     });
+    getStocksInfo();
     m_server.listen(port);
     m_server.start_accept();
     m_server.run();
@@ -45,17 +46,26 @@ void Server::handleMessage(websocketpp::connection_hdl hdl, server::message_ptr 
     if(msg->get_opcode() == websocketpp::frame::opcode::text) {
         std::cout << "Received text message: " << msg->get_payload() << std::endl;
         json::value req = json::value::parse(msg->get_payload());
+        json::value response;
 
         if (req.at("fun").as_string() == "login") {
-            json::value response = handleLogin(req);
-             m_server.send(hdl, response.serialize(), msg->get_opcode());
+            response = handleLogin(req);
+            m_server.send(hdl, response.serialize(), msg->get_opcode());
         }
         else if (req.at("fun").as_string() == "register") {
-            json::value response = handleRegister(req);
+            response = handleRegister(req);
             m_server.send(hdl, response.serialize(), msg->get_opcode());
         }
         else if (req.at("fun").as_string() == "getdetails") {
-            json::value response = getUserDetails(req);
+            response = getUserDetails(req);
+            m_server.send(hdl, response.serialize(), msg->get_opcode());
+        }
+        else if (req.at("fun").as_string() == "getallstocks"){
+            response = getStocksInfo();
+            m_server.send(hdl, response.serialize(), msg->get_opcode());
+        }
+        else if (req.at("fun").as_string() == "buystock"){
+            response = buyStock(req);
             m_server.send(hdl, response.serialize(), msg->get_opcode());
         }
         else{
@@ -128,7 +138,7 @@ json::value Server::handleRegister(json::value registerdetails) {
     if (res->next()) {
         json::value response;
         response[U("status")] = json::value::string("failure");
-        response[U("message")] = json::value::string("Email already exists. Please try again.");
+        response[U("message")] = json::value::string("Email already in use. Please try again.");
         response[U("data")] = json::value::object();
         response[U("fun")] = json::value::string("register");
         delete res;
@@ -150,7 +160,7 @@ json::value Server::handleRegister(json::value registerdetails) {
 
     json::value response;
     response[U("status")] = json::value::string("success");
-    response[U("message")] = json::value::string("Registration successful!");
+    response[U("message")] = json::value::string("Registration successful! Please login to continue.");
     response[U("data")] = json::value::object();
     response[U("fun")] = json::value::string("register");
 
@@ -188,5 +198,85 @@ json::value Server::getUserDetails(json::value email) {
         response[U("fun")] = json::value::string("getdetails");
     }
     delete res;
+    return response;
+}
+
+json::value Server::getStocksInfo(){
+    //call api to get stock info
+    http_client client(U("http://localhost:8080/stocks"));
+    json::value apiresponse;
+    try{
+        http_response res = client.request(methods::GET).get();
+        apiresponse = res.extract_json().get();
+    }
+    catch(const std::exception& e){
+        std::cerr << e.what() << std::endl;
+        throw e;
+    }
+
+    json::value response;
+    response[U("status")] = json::value::string("success");
+    response[U("message")] = json::value::string("Stocks info found!");
+    response[U("data")] = apiresponse;
+    response[U("fun")] = json::value::string("getallstocks");
+
+
+    // std::cout << "Stocks info: " << response << std::endl;
+    return response;
+}
+
+json::value Server::buyStock(json::value buydetails){
+    http_client client(U("http://localhost:8080/buystock"));
+    json::value apiresponse;
+    try{
+        http_request req(methods::POST);
+        req.set_body(buydetails.at("data"));
+
+        http_response resp = client.request(req).get();
+        apiresponse = resp.extract_json().get();
+        std::cout << "===============================================================================API response to buystock: " << apiresponse << std::endl;
+    }
+    catch(const std::exception& e){
+        std::cerr << e.what() << std::endl;
+        json::value response;
+        response[U("status")] = json::value::string("failure");
+        response[U("message")] = json::value::string("Failed to buy stock!");
+        response[U("data")] = json::value::object();
+        response[U("fun")] = json::value::string("buystock");
+        return response;
+    }
+
+    json::value response;
+    response[U("status")] = json::value::string("success");
+    response[U("message")] = apiresponse.at("message");
+    response[U("data")][U("stocks")] = apiresponse.at("stocks");
+    response[U("fun")] = json::value::string("buystock");
+
+    return response;
+}
+
+json::value Server::sellStock(json::value selldetails){
+    http_client client(U("http://localhost:8080/sellstock"));
+    json::value apiresponse;
+    try{
+        http_response res = client.request(methods::POST, selldetails.as_string()).get();
+        apiresponse = res.extract_json().get();
+    }
+    catch(const std::exception& e){
+        std::cerr << e.what() << std::endl;
+        json::value response;
+        response[U("status")] = json::value::string("failure");
+        response[U("message")] = json::value::string("Failed to sell stock!");
+        response[U("data")] = json::value::object();
+        response[U("fun")] = json::value::string("sellstock");
+        return response;
+    }
+
+    json::value response;
+    response[U("status")] = json::value::string("success");
+    response[U("message")] = apiresponse.at("message");
+    response[U("data")][U("stocks")] = apiresponse.at("stocks");
+    response[U("fun")] = json::value::string("sellstock");
+
     return response;
 }
