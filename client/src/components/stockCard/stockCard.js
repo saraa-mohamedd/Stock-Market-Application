@@ -19,7 +19,7 @@ export default function StockCard(props) {
         }
         setPrices(props.prices);
         console.log("stock card prices: ", props.prices);
-    }, [props.prices]);
+    }, [props.prices.length]);
 
     const handleBuy = () => {
         let request = {
@@ -68,13 +68,6 @@ export default function StockCard(props) {
         }
     }, [ws, token, connected]);
 
-    useEffect(() => {
-        console.log("prices: ", prices);
-        if (chartRef.current){
-            chartRef.current.scrollLeft = chartRef.current.scrollWidth;
-        }
-    }, [props.prices.length]);
-
     return (
         <div className="stockCard">
             <div className="text">
@@ -95,7 +88,7 @@ export default function StockCard(props) {
                         type="natural"
                         dataKey="price"
                         isAnimationActive={true}
-                        animationDuration={0.1}
+                        animationDuration={0.01}
                         stroke="#002349"
                         strokeWidth={1}
                         fill="url(#fillGradient)"
