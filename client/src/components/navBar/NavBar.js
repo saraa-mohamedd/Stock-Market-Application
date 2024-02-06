@@ -1,7 +1,7 @@
 import './styles.css';
 import { Link, useMatch, useResolvedPath } from "react-router-dom";
 import { AiOutlineStock } from "react-icons/ai";
-import {MdLogout} from "react-icons/md";
+import {MdLogout, MdHistory} from "react-icons/md";
 import { useAuth } from '../../context/AuthContext.js';
 
 export default function NavBar() {
@@ -14,7 +14,8 @@ export default function NavBar() {
         <ul>
             <CustomLink to="/stocks">Stocks</CustomLink>
             <CustomLink to="/wallet">My Wallet</CustomLink>
-            {token ? <MdLogout className="logout-icon" size={50} onClick={handleLogOut} ></MdLogout> : <div></div>}
+            <CustomLink to="/transactions">{token ? <MdHistory id="history-icon" size={50}></MdHistory> : <div></div>}</CustomLink>
+            {token ? <MdLogout id="login-icon" size={50} onClick={handleLogOut} ></MdLogout> : <div></div>}
         </ul>
         </nav>
     );

@@ -22,6 +22,7 @@ function App() {
                   <Route path="/" element={<ProvideAuth><ProvideServer><Home /></ProvideServer></ProvideAuth>} />
                   <Route path="/stocks" element={<ProvideAuth><ProvideServer><Stocks /></ProvideServer></ProvideAuth>} />
                   <Route path="/wallet" element={<ProvideAuth><ProvideServer><Wallet /></ProvideServer></ProvideAuth>} />
+                  <Route path="/transactions" element={<ProvideAuth><ProvideServer><Transactions /></ProvideServer></ProvideAuth>} />
                 </Routes>
               </ProvideServer>
             </ProvideAuth>
