@@ -2,6 +2,7 @@ import NavBar from './components/navBar/NavBar';
 import Home from './pages/Home/Home';
 import Stocks from './pages/Stocks/Stocks';
 import Wallet from './pages/Wallet/Wallet';
+import Transactions from './pages/Transactions/Transactions';
 import { Route, Routes, Link } from "react-router-dom";
 import { ProvideAuth, useAuth } from './context/AuthContext';
 import { ProvideServer, ServiceProvider } from './context/ServerContext';

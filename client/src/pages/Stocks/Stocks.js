@@ -109,7 +109,7 @@ export default function Stocks() {
                     :
                     <>
                     <div className="stockpage-wrapper">
-                        <h2>View and purchase stocks here! With real-time stock price updates, monitor the market and make <span className="highlight"> informed decisions. </span></h2>
+                        <h2>View and purchase stocks here! With <span className="highlight">real-time</span> stock price updates, monitor the market and make <span className="highlight"> informed decisions. </span></h2>
                         <div className='stocks-container'>
                             {stocks.map((stock, index) => {
                                 return (

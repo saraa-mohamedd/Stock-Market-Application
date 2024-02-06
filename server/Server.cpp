@@ -76,6 +76,10 @@ void Server::handleMessage(websocketpp::connection_hdl hdl, server::message_ptr 
             response = sellStock(req);
             m_server.send(hdl, response.serialize(), msg->get_opcode());
         }
+        else if (req.at("fun").as_string() == "gettransactions"){
+            response = getUserTransactions(req);
+            m_server.send(hdl, response.serialize(), msg->get_opcode());
+        }
         else{
             std::cout << "Invalid function" << std::endl;
         }
@@ -382,7 +386,9 @@ json::value Server::getUserTransactions(json::value email){
         response[U("fun")] = json::value::string("gettransactions");
     }
 
-    json::value transactions = json::value::object();
+    //create transactions array of json objects
+    response[U("data")][U("transactions")] = json::value::array();
+    std::cout << "transactions here: " << std::endl;
     while(res->next()){
         json::value transaction;
         transaction[U("type")] = json::value::string(res->getString("type"));
@@ -390,12 +396,13 @@ json::value Server::getUserTransactions(json::value email){
         transaction[U("price")] = json::value::number(static_cast<double>(res->getDouble("price")));
         transaction[U("datetime")] = json::value::string(res->getString("datetime"));
         transaction[U("type")] = json::value::string(res->getString("type"));   
-        transactions[res->getRow()] = transaction;
+        //add transaction to transactions
+        response[U("data")][U("transactions")][response[U("data")][U("transactions")].size()] = transaction;
     }
 
     response[U("status")] = json::value::string("success");
     response[U("message")] = json::value::string("User transactions found!");
-    response[U("data")][U("transactions")] = transactions;
+    // response[U("data")][U("transactions")] = transactions;
     response[U("fun")] = json::value::string("gettransactions");
 
     delete res;

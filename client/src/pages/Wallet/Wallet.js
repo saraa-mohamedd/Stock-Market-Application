@@ -96,6 +96,7 @@ export default function Wallet() {
             </ProvideAuth>   
         )
     }
+    
 
     return (
         <ProvideAuth>
