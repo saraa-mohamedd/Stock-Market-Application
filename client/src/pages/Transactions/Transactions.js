@@ -4,7 +4,7 @@ import { useAuth, ProvideAuth } from '../../context/AuthContext.js';
 import { useServer, ProvideServer } from '../../context/ServerContext.js';
 import { useEffect, useState, React } from 'react';
 import TransactionCard from '../../components/TransactionCard/TransactionCard.js'
-import UserLogin from '../../components/userLogin/UserLogin.js';
+import UserLogin from '../../components/UserLogin/UserLogin.js';
 import ReactLoading from 'react-loading';
 
 export default function Wallet() {

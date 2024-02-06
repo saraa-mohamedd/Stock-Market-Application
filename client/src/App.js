@@ -1,4 +1,4 @@
-import NavBar from './components/navBar/NavBar';
+import NavBar from './components/NavBar/NavBar';
 import Home from './pages/Home/Home';
 import Stocks from './pages/Stocks/Stocks';
 import Wallet from './pages/Wallet/Wallet';

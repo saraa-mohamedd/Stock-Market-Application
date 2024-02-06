@@ -1,6 +1,6 @@
 import './styles.css';
 import { AiFillDollarCircle } from 'react-icons/ai';
-import UserLogin from '../../components/userLogin/UserLogin';
+import UserLogin from '../../components/UserLogin/UserLogin';
 import { ProvideAuth, useAuth } from '../../context/AuthContext';
 import { ProvideServer, useServer } from '../../context/ServerContext';
 import { useEffect, useState } from 'react';

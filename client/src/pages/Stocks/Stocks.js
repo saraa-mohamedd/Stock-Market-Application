@@ -3,8 +3,8 @@ import './styles.css'
 import { useAuth, ProvideAuth } from '../../context/AuthContext';
 import { useServer, ProvideServer } from '../../context/ServerContext';
 import { useEffect, useState, React } from 'react';
-import StockCard from '../../components/stockCard/stockCard.js'
-import UserLogin from '../../components/userLogin/UserLogin.js';
+import StockCard from '../../components/StockCard/stockCard.js'
+import UserLogin from '../../components/UserLogin/UserLogin.js';
 import ReactLoading from 'react-loading';
 import { AreaChart, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Area} from 'recharts';
 

@@ -3,8 +3,8 @@ import './styles.css'
 import { useAuth, ProvideAuth } from '../../context/AuthContext.js';
 import { useServer, ProvideServer } from '../../context/ServerContext.js';
 import { useEffect, useState, React } from 'react';
-import StockCard from '../../components/stockCard/stockCard.js'
-import UserLogin from '../../components/userLogin/UserLogin.js';
+import StockCard from '../../components/StockCard/stockCard.js'
+import UserLogin from '../../components/UserLogin/UserLogin.js';
 import ReactLoading from 'react-loading';
 
 export default function Wallet() {
