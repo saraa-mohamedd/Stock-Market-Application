@@ -27,6 +27,7 @@ class Server {
         server m_server;
         Database db_;
 
+        //methods to handle different types of messages (called by handleMessage)
         json::value handleLogin(json::value logindetails);
         json::value handleRegister(json::value registerdetails);
         json::value getUserDetails(json::value email);
@@ -37,9 +38,9 @@ class Server {
         json::value getUserTransactions(json::value email);
     public:
         Server();
-        
         void start(uint16_t port);
 
+        //handle incoming messages
         void handleMessage(websocketpp::connection_hdl hdl, server::message_ptr msg);
 };
 

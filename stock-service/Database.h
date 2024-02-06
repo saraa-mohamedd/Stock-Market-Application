@@ -17,6 +17,7 @@ class Database {
             return true;
         }
 
+        // for executing queries that don't return a result set (e.g. INSERT, UPDATE, DELETE, etc.)
         void executeQuery(const std::string& query) {
             sql::Statement* stmt = connection_->createStatement();
             try{
@@ -29,14 +30,20 @@ class Database {
             delete stmt;
         }
 
+        // for executing SELECT queries that return a result set
         sql::ResultSet* executeSelect(const std::string& query) {
             sql::Statement* stmt = connection_->createStatement();
-            sql::ResultSet* res = stmt->executeQuery(query);
+            sql::ResultSet* res;
+            try{
+                res = stmt->executeQuery(query);
+            }
+            catch(const std::exception& e){
+                std::cerr << e.what() << std::endl;
+                throw e;
+            }
             delete stmt;
             return res;
         }
-
-        // Other methods for interacting with the database go here...
 
     private:
         std::string host_;

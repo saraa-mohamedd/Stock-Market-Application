@@ -93,19 +93,21 @@ json::value Server::handleLogin(json::value logindetails) {
     std::string email = logindetails.at("data").at("email").as_string();
     std::string password = logindetails.at("data").at("password").as_string();
 
+    // Check if the email and password match a record in the database
     std::string query = "SELECT * FROM stockmarket.users WHERE email = '" + email + "' AND password = '" + password + "'";
     sql::ResultSet* res;
+    json::value response;
 
     try{
         res = db_.executeSelect(query);
     }
     catch(const std::exception& e){
         std::cerr << e.what() << std::endl;
+        delete res;
         throw e;
     }
 
-    json::value response;
-
+    // If a record is found, send the user's details to the client
     if(res->next()) {
         json::value data;
         data[U("fullname")] = json::value::string(U(res->getString("fullName")));
@@ -122,12 +124,9 @@ json::value Server::handleLogin(json::value logindetails) {
         response[U("message")] = json::value::string("Invalid email or password. Please try again.");
         response[U("data")] = json::value::object();
         response[U("fun")] = json::value::string("login");
-
-
-        std::cout << response << std::endl;
     }
+
     delete res;
-    std:: cout << "serialized response" << response.serialize() << std::endl;
     return response;
 }
 
@@ -136,19 +135,27 @@ json::value Server::handleRegister(json::value registerdetails) {
     std::string email = registerdetails.at("data").at("email").as_string();
     std::string password = registerdetails.at("data").at("password").as_string();
 
+    // Check if the email is already in use
     std::string query = "SELECT * FROM stockmarket.users WHERE email = '" + email + "'";
     sql::ResultSet* res;
+    json::value response;
 
     try{
         res = db_.executeSelect(query);
     }
     catch(const std::exception& e){
         std::cerr << e.what() << std::endl;
-        throw e;
+        response[U("status")] = json::value::string("failure");
+        response[U("message")] = json::value::string("Registration failed. Please try again.");
+        response[U("data")] = json::value::object();
+        response[U("fun")] = json::value::string("register");
+
+        delete res;
+        return response;
     }
 
+    // If the email is already in use, send a failure message to the client
     if (res->next()) {
-        json::value response;
         response[U("status")] = json::value::string("failure");
         response[U("message")] = json::value::string("Email already in use. Please try again.");
         response[U("data")] = json::value::object();
@@ -157,20 +164,26 @@ json::value Server::handleRegister(json::value registerdetails) {
         return response;
     }
 
+    // If the email is not in use, add the user to the database
     query = "INSERT INTO stockmarket.users (fullName, email, password) VALUES ('" + fullname + "', '" + email + "', '" + password + "')";
     try{
         db_.executeQuery(query);
     }
     catch(const std::exception& e){
         std::cerr << e.what() << std::endl;
-        throw e;
+        response[U("status")] = json::value::string("failure");
+        response[U("message")] = json::value::string("Registration failed. Please try again.");
+        response[U("data")] = json::value::object();
+        response[U("fun")] = json::value::string("register");
+
+        delete res;
+        return response;
     }
 
     json::value data;
     data[U("fullname")] = json::value::string(fullname);
     data[U("email")] = json::value::string(email);
 
-    json::value response;
     response[U("status")] = json::value::string("success");
     response[U("message")] = json::value::string("Registration successful! Please login to continue.");
     response[U("data")] = json::value::object();
@@ -184,16 +197,22 @@ json::value Server::getUserDetails(json::value email) {
     std::string email_ = email.at("data").at("email").as_string();
     std::string query = "SELECT * FROM stockmarket.users WHERE email = '" + email_ + "'";
     sql::ResultSet* res;
+    json::value response;
 
     try{
         res = db_.executeSelect(query);
     }
     catch(const std::exception& e){
         std::cerr << e.what() << std::endl;
-        throw e;
+        response[U("status")] = json::value::string("failure");
+        response[U("message")] = json::value::string("User details not found!");
+        response[U("data")] = json::value::object();
+        response[U("fun")] = json::value::string("getdetails");
+        delete res;
+        return response;
     }
 
-    json::value response;
+    // If a record is found, send the user's details to the client
     if(res->next()) {
         json::value data;
         data[U("fullname")] = json::value::string(U(res->getString("fullName")));
@@ -203,63 +222,70 @@ json::value Server::getUserDetails(json::value email) {
         response[U("message")] = json::value::string("User details found!");
         response[U("data")] = data;
         response[U("fun")] = json::value::string("getdetails");
-    } else {
+    } // If no record is found, send a failure message to the client
+    else {
         response[U("status")] = json::value::string("failure");
         response[U("message")] = json::value::string("User details not found!");
         response[U("data")] = json::value::object();
         response[U("fun")] = json::value::string("getdetails");
     }
+
     delete res;
     return response;
 }
 
 json::value Server::getStocksInfo(){
-    //call api to get stock info
+    //call api endpoint (from stock service) to get stock info
     http_client client(U("http://localhost:8080/stocks"));
     json::value apiresponse;
+    json::value response;
+
     try{
         http_response res = client.request(methods::GET).get();
         apiresponse = res.extract_json().get();
     }
     catch(const std::exception& e){
         std::cerr << e.what() << std::endl;
-        throw e;
+        response[U("status")] = json::value::string("failure");
+        response[U("message")] = json::value::string("Failed to get stocks info!");
+        response[U("data")] = json::value::object();
+        response[U("fun")] = json::value::string("getallstocks");
+        return response;
     }
 
-    json::value response;
     response[U("status")] = json::value::string("success");
     response[U("message")] = json::value::string("Stocks info found!");
     response[U("data")] = apiresponse;
     response[U("fun")] = json::value::string("getallstocks");
 
-
-    // std::cout << "Stocks info: " << response << std::endl;
     return response;
 }
 
 json::value Server::buyStock(json::value buydetails){
+    //call api endpoint (from stock service) to buy stock
     http_client client(U("http://localhost:8080/buystock"));
     json::value apiresponse;
+    json::value response;
+
     try{
         http_request req(methods::POST);
         req.set_body(buydetails.at("data"));
 
         http_response resp = client.request(req).get();
         apiresponse = resp.extract_json().get();
-        std::cout << "apiresponse: " << apiresponse << std::endl;
     }
     catch(const std::exception& e){
         std::cerr << e.what() << std::endl;
-        json::value response;
         response[U("status")] = json::value::string("failure");
         response[U("message")] = json::value::string("Failed to buy stock!");
         response[U("data")] = json::value::object();
         response[U("fun")] = json::value::string("buystock");
         return response;
     }
-    //change the price to remove the quotations around it
+    //edit price string to remove the quotations around it
     std::string pricestr = buydetails.at("data").at("price").as_string().substr(1, buydetails.at("data").at("price").as_string().length()-2);
 
+    //log transaction in database
     std::string query = "INSERT INTO stockmarket.transactions (email, type, stockCompany, price, datetime) VALUES ('" + buydetails.at("data").at("email").as_string() + "', 'buy', '" + buydetails.at("data").at("company").as_string() + "', " + pricestr + ", now())";
     sql::ResultSet* res;
 
@@ -273,21 +299,26 @@ json::value Server::buyStock(json::value buydetails){
         response[U("message")] = json::value::string("Failed to log transaction!");
         response[U("data")] = json::value::object();
         response[U("fun")] = json::value::string("buystock");
+
+        delete res;
         return response;
     }
 
-    json::value response;
     response[U("status")] = json::value::string("success");
     response[U("message")] = apiresponse.at("message");
     response[U("data")][U("stocks")] = apiresponse.at("stocks");
     response[U("fun")] = json::value::string("buystock");
 
+    delete res;
     return response;
 }
 
 json::value Server::sellStock(json::value selldetails){
+    //call api endpoint (from stock service) to sell stock
     http_client client(U("http://localhost:8080/sellstock"));
     json::value apiresponse;
+    json::value response;
+
     try{
         http_request req(methods::POST);
         req.set_body(selldetails.at("data"));
@@ -297,15 +328,18 @@ json::value Server::sellStock(json::value selldetails){
     }
     catch(const std::exception& e){
         std::cerr << e.what() << std::endl;
-        json::value response;
         response[U("status")] = json::value::string("failure");
         response[U("message")] = json::value::string("Failed to sell stock!");
         response[U("data")] = json::value::object();
         response[U("fun")] = json::value::string("sellstock");
+
+        delete res;
         return response;
     }
+    //edit price string to remove the quotations around it
     std::string pricestr = selldetails.at("data").at("price").as_string().substr(1, selldetails.at("data").at("price").as_string().length()-2);
-    std::cout << "price: " << pricestr << std::endl;
+    
+    //log transaction in database
     std::string query = "INSERT INTO stockmarket.transactions (email, type, stockCompany, price, datetime) VALUES ('" + selldetails.at("data").at("email").as_string() + "', 'sell', '" + selldetails.at("data").at("company").as_string() + "', " + pricestr +  ", now())";
     sql::ResultSet* res;
 
@@ -314,64 +348,57 @@ json::value Server::sellStock(json::value selldetails){
     }
     catch(const std::exception& e){
         std::cerr << e.what() << std::endl;
-        json::value response;
         response[U("status")] = json::value::string("failure");
         response[U("message")] = json::value::string("Failed to log transaction!");
         response[U("data")] = json::value::object();
         response[U("fun")] = json::value::string("sellstock");
+
+        delete res;
         return response;
     }
 
-    json::value response;
     response[U("status")] = json::value::string("success");
     response[U("message")] = apiresponse.at("message");
     response[U("data")][U("stocks")] = apiresponse.at("stocks");
     response[U("fun")] = json::value::string("sellstock");
 
+    delete res;
     return response;
 }
 
 json::value Server::getUserStocks(json::value email){
+    //call api endpoint (from stock service) to get user stocks with email as query parameter
     http_client client(U("http://localhost:8080/userstocks/?email=" + email.at("data").at("email").as_string()));
     json::value apiresponse;
+    json::value response;
 
     try{
         http_request req(methods::GET);
         http_response res = client.request(req).get();
-
-        try{
-            apiresponse = res.extract_json().get();
-        }
-        catch(const std::exception& e){
-            json::value response;
-            response[U("status")] = json::value::string("failure");
-            response[U("message")] = json::value::string("Failed to get user stocks!");
-            response[U("data")] = json::value::object();
-            response[U("fun")] = json::value::string("getuserstocks");
-            return response;
-        }
+        apiresponse = res.extract_json().get();
     }
     catch(const std::exception& e){
         std::cerr << e.what() << std::endl;
-        json::value response;
         response[U("status")] = json::value::string("failure");
         response[U("message")] = json::value::string("Failed to get user stocks!");
         response[U("data")] = json::value::object();
         response[U("fun")] = json::value::string("getuserstocks");
+
+        delete res;
         return response;
     }
 
-    json::value response;
     response[U("status")] = json::value::string("success");
     response[U("message")] = apiresponse.at("message");
     response[U("data")][U("stocks")] = apiresponse.at("stocks");
     response[U("fun")] = json::value::string("getuserstocks");
 
+    delete res;
     return response;
-
 }
 
 json::value Server::getUserTransactions(json::value email){
+    //get user transactions from database
     std::string query = "SELECT * FROM stockmarket.transactions WHERE email = '" + email.at("data").at("email").as_string() + "'";
     sql::ResultSet* res;
     json::value response;
@@ -384,11 +411,15 @@ json::value Server::getUserTransactions(json::value email){
         response[U("message")] = json::value::string("User transactions not found!");
         response[U("data")] = json::value::object();
         response[U("fun")] = json::value::string("gettransactions");
+
+        delete res;
+        return response;
     }
 
     //create transactions array of json objects
     response[U("data")][U("transactions")] = json::value::array();
-    std::cout << "transactions here: " << std::endl;
+
+    //add each transaction to the transactions array
     while(res->next()){
         json::value transaction;
         transaction[U("type")] = json::value::string(res->getString("type"));
@@ -402,7 +433,6 @@ json::value Server::getUserTransactions(json::value email){
 
     response[U("status")] = json::value::string("success");
     response[U("message")] = json::value::string("User transactions found!");
-    // response[U("data")][U("transactions")] = transactions;
     response[U("fun")] = json::value::string("gettransactions");
 
     delete res;
