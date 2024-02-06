@@ -11,7 +11,7 @@ export default function Wallet() {
     const { token } = useAuth();
     const { ws, connected } = useServer();
     const [stocks, setStocks] = useState([]);
-    const [walletpagewrapper, setWalletPageWrapper] = useState(<div></div>)
+    const [stockPrices, setStockPrices] = useState(new Map());
 
     // handling receiving messages from the server
     useEffect(() => {
@@ -63,44 +63,31 @@ export default function Wallet() {
         }
     }
 
-    // rendering page either loading or with stocks depending on if stocks have been fetched
     useEffect(() => {
-        if (stocks.length == 0) {
-            setWalletPageWrapper(
-                <div className="walletpage-wrapper">
-                    <div className='loading-text'>Loading your stocks...</div>
-                    <ReactLoading type={'balls'} color={"#002349"} height={'10rem'} width={'15rem'} />
-                </div>
-            )
-        }
-        else {
-           setWalletPageWrapper(
-            <>
-            <div className="walletpage-wrapper">
-                <h2>View your stocks here! With real-time stock price updates, <span class="highlight">monitor</span> and <span className='highlight'>sell</span> your stocks.</h2>
-                <div className='stocks-container'>
-                    {stocks.map((stock, index) => {
-                        return (
-                            <ProvideAuth>
-                                <ProvideServer>
-                                    <StockCard key={stock.company} type={"sell"} name={stock.company} price={stock.price} shares={stock.remainingShares} />
-                                </ProvideServer>
-                            </ProvideAuth>
-                        )
-                    })}
-                </div>
-            </div></>
-           )
-        }
-
-    }, [stocks]);
+        console.log('stocks in useeffect: ', stocks);
+        let prices = new Map();
+        stocks.forEach(stock => {
+            let price = stock.price;
+            let name = stock.company;
+            if (stockPrices.has(name)) {
+                let existingPrices = stockPrices.get(name);
+                existingPrices.push({price: price});
+                prices.set(name, existingPrices);
+            }
+            else{
+                prices.set(name, [{price: price}]);
+            }
+        })
+        setStockPrices(prices);
+        console.log('stockPrices: ', stockPrices);
+    }
+    , [stocks]);
 
     // setting a token automatically refreshes the page, so this does not need to be in a useEffect
     if (!token) {
         return (
             <ProvideAuth>
                 <ProvideServer>
-                    {walletpagewrapper}
                     <div className="walletpage-wrapper">
                         <h2>Please <span className="highlight">sign up</span> or <span class="highlight">log in</span> to access this page</h2>
                         <UserLogin />
@@ -113,7 +100,28 @@ export default function Wallet() {
     return (
         <ProvideAuth>
             <ProvideServer>
-                {walletpagewrapper}
+                {stocks.length == 0 ?  
+                    <div className="walletpage-wrapper">
+                        <div className='loading-text'>Loading your stocks...</div>
+                        <ReactLoading type={'balls'} color={"#002349"} height={'10rem'} width={'15rem'} />
+                    </div>
+                    :
+                    <>
+                    <div className="walletpage-wrapper">
+                        <h2>View your stocks here! With real-time stock price updates, <span class="highlight">monitor</span> and <span className='highlight'>sell</span> your stocks.</h2>
+                        <div className='stocks-container'>
+                            {stocks.map((stock, index) => {
+                                return (
+                                    <ProvideAuth>
+                                        <ProvideServer>
+                                            <StockCard key={stock.company} type={"sell"} name={stock.company} prices={stockPrices.has(stock.company) ? stockPrices.get(stock.company) : []} shares={stock.remainingShares} />
+                                        </ProvideServer>
+                                    </ProvideAuth>
+                                )
+                            })}
+                        </div>
+                    </div></>
+                }
             </ProvideServer>
         </ProvideAuth>
     )

@@ -242,12 +242,31 @@ json::value Server::buyStock(json::value buydetails){
 
         http_response resp = client.request(req).get();
         apiresponse = resp.extract_json().get();
+        std::cout << "apiresponse: " << apiresponse << std::endl;
     }
     catch(const std::exception& e){
         std::cerr << e.what() << std::endl;
         json::value response;
         response[U("status")] = json::value::string("failure");
         response[U("message")] = json::value::string("Failed to buy stock!");
+        response[U("data")] = json::value::object();
+        response[U("fun")] = json::value::string("buystock");
+        return response;
+    }
+    //change the price to remove the quotations around it
+    std::string pricestr = buydetails.at("data").at("price").as_string().substr(1, buydetails.at("data").at("price").as_string().length()-2);
+
+    std::string query = "INSERT INTO stockmarket.transactions (email, type, stockCompany, price, datetime) VALUES ('" + buydetails.at("data").at("email").as_string() + "', 'buy', '" + buydetails.at("data").at("company").as_string() + "', " + pricestr + ", now())";
+    sql::ResultSet* res;
+
+    try{
+        res = db_.executeSelect(query);
+    }
+    catch(const std::exception& e){
+        std::cerr << e.what() << std::endl;
+        json::value response;
+        response[U("status")] = json::value::string("failure");
+        response[U("message")] = json::value::string("Failed to log transaction!");
         response[U("data")] = json::value::object();
         response[U("fun")] = json::value::string("buystock");
         return response;
@@ -281,6 +300,23 @@ json::value Server::sellStock(json::value selldetails){
         response[U("fun")] = json::value::string("sellstock");
         return response;
     }
+    std::string pricestr = selldetails.at("data").at("price").as_string().substr(1, selldetails.at("data").at("price").as_string().length()-2);
+    std::cout << "price: " << pricestr << std::endl;
+    std::string query = "INSERT INTO stockmarket.transactions (email, type, stockCompany, price, datetime) VALUES ('" + selldetails.at("data").at("email").as_string() + "', 'sell', '" + selldetails.at("data").at("company").as_string() + "', " + pricestr +  ", now())";
+    sql::ResultSet* res;
+
+    try{
+        res = db_.executeSelect(query);
+    }
+    catch(const std::exception& e){
+        std::cerr << e.what() << std::endl;
+        json::value response;
+        response[U("status")] = json::value::string("failure");
+        response[U("message")] = json::value::string("Failed to log transaction!");
+        response[U("data")] = json::value::object();
+        response[U("fun")] = json::value::string("sellstock");
+        return response;
+    }
 
     json::value response;
     response[U("status")] = json::value::string("success");
@@ -297,9 +333,6 @@ json::value Server::getUserStocks(json::value email){
 
     try{
         http_request req(methods::GET);
-        // req.set_request_uri(U("/endpoint?param1=value1&param2=value2"));
-        // req.headers().add(U("email"), email.at("data").at("email").as_string());
-        std::cout << "Request at TCP: " << req.to_string() << std::endl;
         http_response res = client.request(req).get();
 
         try{
@@ -308,9 +341,9 @@ json::value Server::getUserStocks(json::value email){
         catch(const std::exception& e){
             json::value response;
             response[U("status")] = json::value::string("failure");
-            response[U("message")] = json::value::string("Failed to sell stock!");
+            response[U("message")] = json::value::string("Failed to get user stocks!");
             response[U("data")] = json::value::object();
-            response[U("fun")] = json::value::string("sellstock");
+            response[U("fun")] = json::value::string("getuserstocks");
             return response;
         }
     }
@@ -318,9 +351,9 @@ json::value Server::getUserStocks(json::value email){
         std::cerr << e.what() << std::endl;
         json::value response;
         response[U("status")] = json::value::string("failure");
-        response[U("message")] = json::value::string("Failed to sell stock!");
+        response[U("message")] = json::value::string("Failed to get user stocks!");
         response[U("data")] = json::value::object();
-        response[U("fun")] = json::value::string("sellstock");
+        response[U("fun")] = json::value::string("getuserstocks");
         return response;
     }
 
@@ -332,4 +365,39 @@ json::value Server::getUserStocks(json::value email){
 
     return response;
 
+}
+
+json::value Server::getUserTransactions(json::value email){
+    std::string query = "SELECT * FROM stockmarket.transactions WHERE email = '" + email.at("data").at("email").as_string() + "'";
+    sql::ResultSet* res;
+    json::value response;
+
+    try{
+        res = db_.executeSelect(query);
+    }
+    catch(const std::exception& e){
+        response[U("status")] = json::value::string("failure");
+        response[U("message")] = json::value::string("User transactions not found!");
+        response[U("data")] = json::value::object();
+        response[U("fun")] = json::value::string("gettransactions");
+    }
+
+    json::value transactions = json::value::object();
+    while(res->next()){
+        json::value transaction;
+        transaction[U("type")] = json::value::string(res->getString("type"));
+        transaction[U("stockCompany")] = json::value::string(res->getString("stockCompany"));
+        transaction[U("price")] = json::value::number(static_cast<double>(res->getDouble("price")));
+        transaction[U("datetime")] = json::value::string(res->getString("datetime"));
+        transaction[U("type")] = json::value::string(res->getString("type"));   
+        transactions[res->getRow()] = transaction;
+    }
+
+    response[U("status")] = json::value::string("success");
+    response[U("message")] = json::value::string("User transactions found!");
+    response[U("data")][U("transactions")] = transactions;
+    response[U("fun")] = json::value::string("gettransactions");
+
+    delete res;
+    return response;
 }

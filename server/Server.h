@@ -34,6 +34,7 @@ class Server {
         json::value buyStock(json::value buydetails);   
         json::value sellStock(json::value selldetails);
         json::value getUserStocks(json::value email);
+        json::value getUserTransactions(json::value email);
     public:
         Server();
         
