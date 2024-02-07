@@ -11,15 +11,13 @@ const Home = () => {
     const {token} = useAuth();
     const [name, setName] = useState('');
 
+    // upon receiving a message from the server
     useEffect(() => {
-        console.log("ws: ", ws);
         if (ws && connected){
             ws.onmessage = evt => {
                 if (evt.data){
                     evt = JSON.parse(evt.data);
-                    console.log("evt: ", evt);
                     if (evt["fun"] == "getdetails" && evt["status"] == "success") {
-                        console.log('got user details');
                         setName(evt["data"]["fullname"]);
                     }
                 }
@@ -27,7 +25,8 @@ const Home = () => {
         }
      }, [ws, token, connected]);
 
-     useEffect(() => {
+    // get user details if token is present and connected to server
+    useEffect(() => {
         let request = {};
         if (token!= "" && token!=null && token!=undefined){
             request = {
@@ -36,7 +35,6 @@ const Home = () => {
                     "email": token
                 }
             }
-            console.log('request: ', request);
 
             if (ws && connected){
                 ws.send(JSON.stringify(request));

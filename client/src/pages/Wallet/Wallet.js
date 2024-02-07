@@ -19,14 +19,10 @@ export default function Wallet() {
             ws.onmessage = evt => {
                 if (evt.data){
                     evt = JSON.parse(evt.data);
-                    // console.log("evt: ", evt);
                     if (evt["fun"] == "getuserstocks" && evt["status"] == "success") {
-                        // console.log('got all user stocks');
-
                         setStocks(evt["data"]["stocks"]);
                     }
                     else if (evt["fun"] == "sellstock" && evt["status"] == "success") {
-                        console.log('sold stock');
                         setStocks(evt["data"]["stocks"]);
                     }
                 }
@@ -42,6 +38,7 @@ export default function Wallet() {
           };
     }, [ws, connected]);
 
+    // function to fetch user stocks
     const fetchUserStocks = () => {
         let request = {};
         if (token!= "" && token!=null && token!=undefined){
@@ -52,19 +49,14 @@ export default function Wallet() {
                 }
             }
 
-            console.log('ws: ', ws);
-            console.log('request: ', request);
-            console.log('connected: ', connected)
-
             if (ws && connected){
-                console.log('sending request');
                 ws.send(JSON.stringify(request));
             }
         }
     }
 
+    // updating stock prices in map (to be sent to stock cards)
     useEffect(() => {
-        console.log('stocks in useeffect: ', stocks);
         let prices = new Map();
         stocks.forEach(stock => {
             let price = stock.price;
@@ -79,9 +71,7 @@ export default function Wallet() {
             }
         })
         setStockPrices(prices);
-        console.log('stockPrices: ', stockPrices);
-    }
-    , [stocks]);
+    }, [stocks]);
 
     // setting a token automatically refreshes the page, so this does not need to be in a useEffect
     if (!token) {
@@ -97,7 +87,6 @@ export default function Wallet() {
         )
     }
     
-
     return (
         <ProvideAuth>
             <ProvideServer>

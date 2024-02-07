@@ -12,13 +12,13 @@ export default function Wallet() {
     const { ws, connected } = useServer();
     const [transactions, setTransactions] = useState([]);
 
+    // request to get all user transactions
     let request = {
         "fun": "gettransactions",
         "data": {
             "email": token,
         }
     }
-    console.log('request: ', request);
     
     // handling receiving messages from the server
     useEffect(() => {
@@ -27,8 +27,6 @@ export default function Wallet() {
                 if (evt.data){
                     evt = JSON.parse(evt.data);
                     if (evt["fun"] == "gettransactions" && evt["status"] == "success") {
-                        console.log('got all user transactions');
-                        console.log('transactions: ', evt["data"]["transactions"]);
                         setTransactions(evt["data"]["transactions"]);
                     }
                 }
@@ -52,7 +50,6 @@ export default function Wallet() {
     
     if (ws && connected){
         ws.send(JSON.stringify(request));
-        console.log('sending request');
     }
 
     //sort transactions by date

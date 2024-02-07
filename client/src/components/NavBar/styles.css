@@ -1,4 +1,4 @@
-.siteTitle{
+.site-title{
     font-size: 2.75em;
     font-weight:800;
     display: flex;
@@ -15,7 +15,7 @@
     color: white;
 }
 
-.navbar{
+.nav-bar{
     background-color: #002349;
     box-shadow: 0 0 10px 0 rgba(0,0,0,0.1);
     display: flex;
@@ -26,13 +26,13 @@
     color: white;
 }
 
-.navbar li{
+.nav-bar li{
     display: flex;
     align-items: center;
     padding: 0.5rem;
 }
 
-.navbar ul{
+.nav-bar ul{
     list-style: none;
     display: flex;
     padding: 0;
@@ -41,7 +41,7 @@
     gap: 1rem;
 }
 
-.navbar li a{
+.nav-bar li a{
     color: inherit;
     font-family: 'Merriweather', sans-serif;
     text-decoration: none;
@@ -54,13 +54,13 @@
 }
 
 
-.navbar li.active{
+.nav-bar li.active{
     color: #E5EDF1;
     /* background-color: azure; */
     border-bottom: 3px solid #E5EDF1;
 }
 
-.navbar li:hover{
+.nav-bar li:hover{
     color: #000;
     background-color: #E5EDF1;
     cursor: pointer;

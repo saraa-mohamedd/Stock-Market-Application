@@ -18,6 +18,7 @@ export default function UserLogin(){
     const [name, setName] = useState('');
     const [message, setMessage] = useState(''); // message to display to user
 
+    // function to handle login
     const handleLogin = async () => {
         if (action === "Sign Up") {
             setAction('Log In');
@@ -33,6 +34,7 @@ export default function UserLogin(){
         ws.send(JSON.stringify(request));
     };
 
+    // function to handle register
     const handleRegister = async () => {    
         if (action === "Log In") {
             setAction('Sign Up');
@@ -49,16 +51,14 @@ export default function UserLogin(){
         ws.send(JSON.stringify(request));
     }
 
+    // upon receiving a message from the server
     useEffect(() => {
         if (ws){
-            console.log('ws: ', ws);
             ws.onmessage = evt => {
                 if (evt.data){
                     evt = JSON.parse(evt.data);
-                    console.log("evt: ", evt);
                     if (evt["fun"] == "login"){
                         if (evt["status"] == "success") {
-                            console.log('Logged in');
                             setAuth(evt["data"]["email"]);
                             setToken(evt["data"]["email"]);
                             window.location.reload();

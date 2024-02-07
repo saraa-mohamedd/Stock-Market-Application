@@ -6,14 +6,12 @@ import { useEffect, useState, React } from 'react';
 import StockCard from '../../components/StockCard/stockCard.js'
 import UserLogin from '../../components/UserLogin/UserLogin.js';
 import ReactLoading from 'react-loading';
-import { AreaChart, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Area} from 'recharts';
 
 export default function Stocks() {
     const { token } = useAuth();
     const { ws, connected } = useServer();
     const [stocks, setStocks] = useState(["no stocks"]);
     const [stockPrices, setStockPrices] = useState(new Map());
-    const [message, setMessage] = useState('');
 
     // handling receiving messages from the server
     useEffect(() => {
@@ -25,18 +23,9 @@ export default function Stocks() {
                     if (evt["fun"] == "getallstocks" && evt["status"] == "success") {
                         setStocks(evt["data"]["stocks"]);
                     }
-                    else if (evt["fun"] == "buystock"){
-                        console.log("I SEE YOU BUYING STOCK")
-                        //set className of message box to display message for 1.5 seconds
-                        let messageBox = document.getElementById('message-box');
-                        messageBox.classList.add(evt["status"]);
-                        messageBox.classList.remove("no-message");
-
-                        setMessage(evt["message"]);
-                        if (evt["status"] == "success") {
-                            setStocks(evt["data"]["stocks"]);
-                        }
-                    } 
+                    else if (evt["fun"] == "buystock" && evt["status"] == "success") {
+                        setStocks(evt["data"]["stocks"]);
+                    }
                 }
             }
         }
@@ -50,6 +39,7 @@ export default function Stocks() {
           };
     }, [ws, connected]);
 
+    // function to fetch stocks
     const fetchStocks = () => {
         let request = {};
         if (token!= "" && token!=null && token!=undefined){
@@ -58,10 +48,6 @@ export default function Stocks() {
                 "data": {}
             }
 
-            console.log('ws: ', ws);
-            console.log('request: ', request);
-            console.log('connected: ', connected)
-
             if (ws && connected){
                 console.log('sending request');
                 ws.send(JSON.stringify(request));
@@ -69,8 +55,8 @@ export default function Stocks() {
         }
     }
 
+    // update stock prices in price map (to be sent to separate stock cards)
     useEffect(() => {
-        console.log('stocks in useeffect: ', stocks);
         let prices = new Map();
         stocks.forEach(stock => {
             let price = stock.price;
@@ -86,7 +72,6 @@ export default function Stocks() {
             
         })
         setStockPrices(prices);
-        console.log('stockPrices: ', stockPrices);
     }
     , [stocks]);
 

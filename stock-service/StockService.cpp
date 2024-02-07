@@ -1,5 +1,4 @@
 #pragma once
-
 #include "StockService.h"
 
 StockService::StockService() : listener_(uri(U("http://localhost:8080"))), db_("localhost:3306", "root", "password", "stockmarket") {
@@ -14,7 +13,12 @@ StockService::StockService() : listener_(uri(U("http://localhost:8080"))), db_("
         std::cout << "Connected to the database" << std::endl;
     }
 
+    // queries to delete all stocks, user_stocks and user_transactions from the database
     std::string deleteStocksSql = "DELETE FROM stockmarket.stocks";
+    std::string deleteUserStocksSql = "DELETE FROM stockmarket.user_stocks";
+    std::string deleteUserTransactionsSql = "DELETE FROM stockmarket.user_transactions";
+
+    // read stocks from initstocks.json
     std::ifstream stocksfile;
     json::value stocks = json::value::array();
 
@@ -29,7 +33,10 @@ StockService::StockService() : listener_(uri(U("http://localhost:8080"))), db_("
         exit(1);
     }
 
+    // delete all stocks, user_stocks and user_transactions from the database
     try{
+        db_.executeQuery(deleteUserTransactionsSql);
+        db_.executeQuery(deleteUserStocksSql);
         db_.executeQuery(deleteStocksSql);
     }
     catch(const std::exception& e){
@@ -37,6 +44,7 @@ StockService::StockService() : listener_(uri(U("http://localhost:8080"))), db_("
         exit(1);
     }
 
+    // insert stocks into the database
     std::cout << stocks.serialize() << std::endl;
     for (int i = 0; i < stocks.size(); i++){
         std::string company = stocks[i][U("company")].as_string();

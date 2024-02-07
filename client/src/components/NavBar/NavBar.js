@@ -9,8 +9,8 @@ export default function NavBar() {
     console.log(token);
 
     return (
-        <nav className="navbar">
-            <Link className="siteTitle" to="/"><AiOutlineStock size={55}/>QuickStock</Link>
+        <nav className="nav-bar">
+            <Link className="site-title" to="/"><AiOutlineStock size={55}/>QuickStock</Link>
         <ul>
             <CustomLink to="/stocks">Stocks</CustomLink>
             <CustomLink to="/wallet">My Wallet</CustomLink>
