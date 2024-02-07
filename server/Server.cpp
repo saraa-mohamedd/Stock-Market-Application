@@ -42,17 +42,25 @@ void Server::start(uint16_t port) {
 }
 
 void Server::handleMessage(websocketpp::connection_hdl hdl, server::message_ptr msg) {
-    logfile_.open("server.log", std::ios_base::app);
-
-    auto timenow = std::chrono::system_clock::now();
-    std::time_t currtime = std::chrono::system_clock::to_time_t(timenow);
 
     if(msg->get_opcode() == websocketpp::frame::opcode::text) {
-
         json::value req = json::value::parse(msg->get_payload());
-        logfile_ << std::ctime(&currtime) << ": " << "Received message for function " << req.at("fun").as_string() << " with data: " << req.at("data").serialize() << std::endl; 
         json::value response;
+        
+        // lock the logfile to prevent multiple threads from writing to it at the same time
+        logfilemutex_.lock();
+        auto timenow = std::chrono::system_clock::now();
+        std::time_t currtime = std::chrono::system_clock::to_time_t(timenow);
 
+        // open the logfile and write the received message to it
+        logfile_.open("server.log", std::ios_base::app);
+        logfile_ << std::ctime(&currtime) << ": " << "Received message for function " << req.at("fun").as_string() << " with data: " << req.at("data").serialize() << std::endl; 
+
+        // close the logfile and unlock the mutex
+        logfile_.close();
+        logfilemutex_.unlock();
+
+        // handle the message based on the function specified in the message
         if (req.at("fun").as_string() == "login") {
             response = handleLogin(req);
         }
@@ -82,15 +90,24 @@ void Server::handleMessage(websocketpp::connection_hdl hdl, server::message_ptr 
             return;
         }
 
+        // send the response to the client
+        m_server.send(hdl, response.serialize(), msg->get_opcode());
+
+        // lock the logfile to prevent multiple threads from writing to it at the same time
+        logfilemutex_.lock();
         timenow = std::chrono::system_clock::now();
         currtime = std::chrono::system_clock::to_time_t(timenow);
-        m_server.send(hdl, response.serialize(), msg->get_opcode());
+
+        // open the logfile and write the sent message to it
+        logfile_.open("server.log", std::ios_base::app);
         logfile_ << std::ctime(&currtime) << ": " << "Sent " << response.at("status").to_string() << " message for function " << req.at("fun").as_string() << " with data: " << response.at("data").serialize() << std::endl;
 
+        // close the logfile and unlock the mutex
         logfile_.close();
+        logfilemutex_.unlock();
 
     } else if(msg->get_opcode() == websocketpp::frame::opcode::binary) {
-        std::cout << "Received binary message" << std::endl;
+        std::cout << "Received binary message- incompatible" << std::endl;
     }
 }
 

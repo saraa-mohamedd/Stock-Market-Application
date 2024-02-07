@@ -13,6 +13,7 @@
 #include <iomanip>
 #include <string>
 #include <fstream>
+#include <mutex>
 #include "Database.h"
 
 using namespace web;
@@ -27,6 +28,7 @@ class Server {
         server m_server;
         Database db_;
         std::ofstream logfile_;
+        mutable std::mutex logfilemutex_;
 
         //methods to handle different types of messages (called by handleMessage)
         json::value handleLogin(json::value logindetails);
