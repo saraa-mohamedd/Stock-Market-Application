@@ -321,6 +321,7 @@ json::value StockService::getUserStocks(std::string email){
             stock[U("price")] = json::value::string(U(res2->getString("price")));
         }
 
+        delete res2;
         response[U("stocks")][response[U("stocks")].size()] = stock;        
     }
 
@@ -357,7 +358,7 @@ json::value StockService::getUserStocks(std::string email){
     
     response[U("message")] = json::value::string(U("User stocks retrieved successfully"));
 
-    delete res; delete res2;
+    delete res;
     return response;
 }
 

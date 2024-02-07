@@ -42,7 +42,7 @@ export default function Wallet() {
             <ProvideAuth>
                 <ProvideServer>
                     <div className="walletpage-wrapper">
-                        <h2>Please <span className="highlight">sign up</span> or <span class="highlight">log in</span> to access this page</h2>
+                        <h2>Please <span className="highlight">sign up</span> or <span className="highlight">log in</span> to access this page</h2>
                         <UserLogin />
                     </div>
                 </ProvideServer>
@@ -54,11 +54,11 @@ export default function Wallet() {
         ws.send(JSON.stringify(request));
         console.log('sending request');
     }
+
     //sort transactions by date
     transactions.sort((a, b) => {
         return new Date(b.datetime) - new Date(a.datetime);
     });
-    // console.log(new Date(transactions[0].datetime));
 
     return (
         <ProvideAuth>

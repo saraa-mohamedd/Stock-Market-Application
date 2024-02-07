@@ -90,7 +90,7 @@ export default function StockCard(props) {
                         isAnimationActive={true}
                         animationDuration={0.01}
                         stroke="#002349"
-                        strokeWidth={1}
+                        strokeWidth={4}
                         fill="url(#fillGradient)"
                         dot={false}
                     />

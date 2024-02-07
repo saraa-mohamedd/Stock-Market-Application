@@ -12,7 +12,7 @@
 #include <iostream>
 #include <iomanip>
 #include <string>
-#include <filesystem>
+#include <fstream>
 #include "Database.h"
 
 using namespace web;
@@ -26,6 +26,7 @@ class Server {
     private:
         server m_server;
         Database db_;
+        std::ofstream logfile_;
 
         //methods to handle different types of messages (called by handleMessage)
         json::value handleLogin(json::value logindetails);

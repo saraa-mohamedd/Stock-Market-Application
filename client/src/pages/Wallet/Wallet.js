@@ -10,7 +10,7 @@ import ReactLoading from 'react-loading';
 export default function Wallet() {
     const { token } = useAuth();
     const { ws, connected } = useServer();
-    const [stocks, setStocks] = useState([]);
+    const [stocks, setStocks] = useState(["no stocks"]);
     const [stockPrices, setStockPrices] = useState(new Map());
 
     // handling receiving messages from the server
@@ -89,7 +89,7 @@ export default function Wallet() {
             <ProvideAuth>
                 <ProvideServer>
                     <div className="walletpage-wrapper">
-                        <h2>Please <span className="highlight">sign up</span> or <span class="highlight">log in</span> to access this page</h2>
+                        <h2>Please <span className="highlight">sign up</span> or <span className="highlight">log in</span> to access this page</h2>
                         <UserLogin />
                     </div>
                 </ProvideServer>
@@ -101,7 +101,7 @@ export default function Wallet() {
     return (
         <ProvideAuth>
             <ProvideServer>
-                {stocks.length == 0 ?  
+                {(stocks.length && stocks[0]== "no stocks") ?  
                     <div className="walletpage-wrapper">
                         <div className='loading-text'>Loading your stocks...</div>
                         <ReactLoading type={'balls'} color={"#002349"} height={'10rem'} width={'15rem'} />
@@ -109,17 +109,21 @@ export default function Wallet() {
                     :
                     <>
                     <div className="walletpage-wrapper">
-                        <h2>View your stocks here! With real-time stock price updates, <span class="highlight">monitor</span> and <span className='highlight'>sell</span> your stocks.</h2>
+                        <h2>View your stocks here! With real-time stock price updates, <span className="highlight">monitor</span> and <span className='highlight'>sell</span> your stocks.</h2>
                         <div className='stocks-container'>
-                            {stocks.map((stock, index) => {
-                                return (
-                                    <ProvideAuth>
-                                        <ProvideServer>
-                                            <StockCard key={stock.company} type={"sell"} name={stock.company} prices={stockPrices.has(stock.company) ? stockPrices.get(stock.company) : []} shares={stock.remainingShares} />
-                                        </ProvideServer>
-                                    </ProvideAuth>
-                                )
-                            })}
+                            {stocks.length > 0 ?
+                                stocks.map((stock, index) => {
+                                    return (
+                                        <ProvideAuth>
+                                            <ProvideServer>
+                                                <StockCard key={stock.company} type={"sell"} name={stock.company} prices={stockPrices.has(stock.company) ? stockPrices.get(stock.company) : []} shares={stock.remainingShares} />
+                                            </ProvideServer>
+                                        </ProvideAuth>
+                                    )
+                                }):
+                                <div className='loading-text'>
+                                    You currently have no stocks. <br/> <span className="highlight">Start investing now!</span> </div>
+                            }
                         </div>
                     </div></>
                 }

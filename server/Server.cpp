@@ -42,47 +42,53 @@ void Server::start(uint16_t port) {
 }
 
 void Server::handleMessage(websocketpp::connection_hdl hdl, server::message_ptr msg) {
+    logfile_.open("server.log", std::ios_base::app);
+
+    auto timenow = std::chrono::system_clock::now();
+    std::time_t currtime = std::chrono::system_clock::to_time_t(timenow);
 
     if(msg->get_opcode() == websocketpp::frame::opcode::text) {
-        std::cout << "Received text message: " << msg->get_payload() << std::endl;
+
         json::value req = json::value::parse(msg->get_payload());
+        logfile_ << std::ctime(&currtime) << ": " << "Received message for function " << req.at("fun").as_string() << " with data: " << req.at("data").serialize() << std::endl; 
         json::value response;
 
         if (req.at("fun").as_string() == "login") {
             response = handleLogin(req);
-            m_server.send(hdl, response.serialize(), msg->get_opcode());
         }
         else if (req.at("fun").as_string() == "register") {
             response = handleRegister(req);
-            m_server.send(hdl, response.serialize(), msg->get_opcode());
         }
         else if (req.at("fun").as_string() == "getdetails") {
             response = getUserDetails(req);
-            m_server.send(hdl, response.serialize(), msg->get_opcode());
         }
         else if (req.at("fun").as_string() == "getallstocks"){
             response = getStocksInfo();
-            m_server.send(hdl, response.serialize(), msg->get_opcode());
         }
         else if (req.at("fun").as_string() == "getuserstocks"){
             response = getUserStocks(req);
-            m_server.send(hdl, response.serialize(), msg->get_opcode());
         }
         else if (req.at("fun").as_string() == "buystock"){
             response = buyStock(req);
-            m_server.send(hdl, response.serialize(), msg->get_opcode());
         }
         else if (req.at("fun").as_string() == "sellstock"){
             response = sellStock(req);
-            m_server.send(hdl, response.serialize(), msg->get_opcode());
         }
         else if (req.at("fun").as_string() == "gettransactions"){
             response = getUserTransactions(req);
-            m_server.send(hdl, response.serialize(), msg->get_opcode());
         }
         else{
             std::cout << "Invalid function" << std::endl;
+            return;
         }
+
+        timenow = std::chrono::system_clock::now();
+        currtime = std::chrono::system_clock::to_time_t(timenow);
+        m_server.send(hdl, response.serialize(), msg->get_opcode());
+        logfile_ << std::ctime(&currtime) << ": " << "Sent " << response.at("status").to_string() << " message for function " << req.at("fun").as_string() << " with data: " << response.at("data").serialize() << std::endl;
+
+        logfile_.close();
+
     } else if(msg->get_opcode() == websocketpp::frame::opcode::binary) {
         std::cout << "Received binary message" << std::endl;
     }
@@ -287,20 +293,17 @@ json::value Server::buyStock(json::value buydetails){
 
     //log transaction in database
     std::string query = "INSERT INTO stockmarket.transactions (email, type, stockCompany, price, datetime) VALUES ('" + buydetails.at("data").at("email").as_string() + "', 'buy', '" + buydetails.at("data").at("company").as_string() + "', " + pricestr + ", now())";
-    sql::ResultSet* res;
 
     try{
-        res = db_.executeSelect(query);
+        db_.executeQuery(query);
     }
     catch(const std::exception& e){
         std::cerr << e.what() << std::endl;
-        json::value response;
         response[U("status")] = json::value::string("failure");
         response[U("message")] = json::value::string("Failed to log transaction!");
         response[U("data")] = json::value::object();
         response[U("fun")] = json::value::string("buystock");
 
-        delete res;
         return response;
     }
 
@@ -309,7 +312,6 @@ json::value Server::buyStock(json::value buydetails){
     response[U("data")][U("stocks")] = apiresponse.at("stocks");
     response[U("fun")] = json::value::string("buystock");
 
-    delete res;
     return response;
 }
 
@@ -333,7 +335,6 @@ json::value Server::sellStock(json::value selldetails){
         response[U("data")] = json::value::object();
         response[U("fun")] = json::value::string("sellstock");
 
-        delete res;
         return response;
     }
     //edit price string to remove the quotations around it
@@ -341,19 +342,18 @@ json::value Server::sellStock(json::value selldetails){
     
     //log transaction in database
     std::string query = "INSERT INTO stockmarket.transactions (email, type, stockCompany, price, datetime) VALUES ('" + selldetails.at("data").at("email").as_string() + "', 'sell', '" + selldetails.at("data").at("company").as_string() + "', " + pricestr +  ", now())";
-    sql::ResultSet* res;
-
+    std::cout << "here";
     try{
-        res = db_.executeSelect(query);
+        db_.executeQuery(query);
     }
     catch(const std::exception& e){
+        std::cout << "in catch";
         std::cerr << e.what() << std::endl;
         response[U("status")] = json::value::string("failure");
         response[U("message")] = json::value::string("Failed to log transaction!");
         response[U("data")] = json::value::object();
         response[U("fun")] = json::value::string("sellstock");
 
-        delete res;
         return response;
     }
 
@@ -362,7 +362,6 @@ json::value Server::sellStock(json::value selldetails){
     response[U("data")][U("stocks")] = apiresponse.at("stocks");
     response[U("fun")] = json::value::string("sellstock");
 
-    delete res;
     return response;
 }
 
@@ -384,7 +383,6 @@ json::value Server::getUserStocks(json::value email){
         response[U("data")] = json::value::object();
         response[U("fun")] = json::value::string("getuserstocks");
 
-        delete res;
         return response;
     }
 
@@ -393,7 +391,6 @@ json::value Server::getUserStocks(json::value email){
     response[U("data")][U("stocks")] = apiresponse.at("stocks");
     response[U("fun")] = json::value::string("getuserstocks");
 
-    delete res;
     return response;
 }
 

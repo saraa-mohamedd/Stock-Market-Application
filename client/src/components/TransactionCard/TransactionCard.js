@@ -6,12 +6,14 @@ export default function TransactionCard(props) {
     let dateStr = date.toDateString();
     let timeStr = date.toLocaleTimeString();
 
+    let spanclass = props.type == 'buy' ? 'bought' : 'sold';
+
     return (
         <div className="transaction-card">
             <h4 id="date-time">{dateStr} {timeStr}</h4>
-            <h3><span className={props.type == 'buy' ? 'bought' : 'sold'}>{props.type == 'buy' ? "Bought " : "Sold "}</span> 
+            <h3><span className={spanclass}>{props.type == 'buy' ? "Bought " : "Sold "}</span> 
                 { props.name} stock for 
-                <span className={props.type == 'buy' ? 'bought' : 'sold'}>{props.type == 'buy' ? " -" : " +"}${props.price}</span></h3>
+                <span className={spanclass}>{props.type == 'buy' ? " -" : " +"}${props.price}</span></h3>
         </div>
     )
 }

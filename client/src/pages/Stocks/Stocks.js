@@ -11,8 +11,9 @@ import { AreaChart, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legen
 export default function Stocks() {
     const { token } = useAuth();
     const { ws, connected } = useServer();
-    const [stocks, setStocks] = useState([]);
+    const [stocks, setStocks] = useState(["no stocks"]);
     const [stockPrices, setStockPrices] = useState(new Map());
+    const [message, setMessage] = useState('');
 
     // handling receiving messages from the server
     useEffect(() => {
@@ -20,17 +21,21 @@ export default function Stocks() {
             ws.onmessage = evt => {
                 if (evt.data){
                     evt = JSON.parse(evt.data);
-                    console.log("evt: ", evt);
+
                     if (evt["fun"] == "getallstocks" && evt["status"] == "success") {
-                        console.log('got all stocks');
                         setStocks(evt["data"]["stocks"]);
-                        // updateStockPrices(evt["data"]["stocks"]);
                     }
-                    else if (evt["fun"] == "buystock" && evt["status"] == "success") {
-                        console.log('bought stock');
-                        setStocks(evt["data"]["stocks"]);
-                        // updateStockPrices(evt["data"]["stocks"]);
-                    }
+                    else if (evt["fun"] == "buystock"){
+                        //set className of message box to display message for 1.5 seconds
+                        let messageBox = document.getElementById('message-box');
+                        messageBox.classList.add(evt["status"]);
+                        messageBox.classList.remove("no-message");
+
+                        setMessage(evt["message"]);
+                        if (evt["status"] == "success") {
+                            setStocks(evt["data"]["stocks"]);
+                        }
+                    } 
                 }
             }
         }
@@ -90,7 +95,7 @@ export default function Stocks() {
             <ProvideAuth>
                 <ProvideServer>
                     <div className="stockpage-wrapper">
-                        <h2>Please <span className="highlight">sign up</span> or <span class="highlight">log in</span> to access this page</h2>
+                        <h2>Please <span className="highlight">sign up</span> or <span className="highlight">log in</span> to access this page</h2>
                         <UserLogin />
                     </div>
                 </ProvideServer>
@@ -101,7 +106,7 @@ export default function Stocks() {
     return (
         <ProvideAuth>
             <ProvideServer>
-                {stocks.length == 0 ?  
+                {stocks.length && stocks[0] == "no stocks"?  
                     <div className="stockpage-wrapper">
                         <div className='loading-text'>Loading stocks...</div>
                         <ReactLoading type={'balls'} color={"#002349"} height={'10rem'} width={'15rem'} />
@@ -110,16 +115,21 @@ export default function Stocks() {
                     <>
                     <div className="stockpage-wrapper">
                         <h2>View and purchase stocks here! With <span className="highlight">real-time</span> stock price updates, monitor the market and make <span className="highlight"> informed decisions. </span></h2>
+                        <div id="message-box" className="no-message" >
+                            {message}
+                        </div>
                         <div className='stocks-container'>
-                            {stocks.map((stock, index) => {
-                                return (
-                                    <ProvideAuth>
-                                        <ProvideServer>
-                                            <StockCard key={stock.company} type={"buy"} name={stock.company} prices={stockPrices.has(stock.company) ? stockPrices.get(stock.company) : []} shares={stock.remainingShares} />
-                                        </ProvideServer>
-                                    </ProvideAuth>
-                                )
-                            })}
+                            {stocks.length > 0 ?
+                                stocks.map((stock, index) => {
+                                    return (
+                                        <ProvideAuth>
+                                            <ProvideServer>
+                                                <StockCard key={stock.company} type={"buy"} name={stock.company} prices={stockPrices.has(stock.company) ? stockPrices.get(stock.company) : []} shares={stock.remainingShares} />
+                                            </ProvideServer>
+                                        </ProvideAuth>
+                                    )
+                                }):
+                                <div className='loading-text'>No stocks available</div>}
                         </div>
                     </div></>
                 }
