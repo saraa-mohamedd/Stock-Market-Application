@@ -13,6 +13,48 @@ StockService::StockService() : listener_(uri(U("http://localhost:8080"))), db_("
     else{
         std::cout << "Connected to the database" << std::endl;
     }
+
+    std::string deleteStocksSql = "DELETE FROM stockmarket.stocks";
+    std::ifstream stocksfile;
+    json::value stocks = json::value::array();
+
+    stocksfile.open("initstocks.json");
+
+    if (stocksfile.is_open()){
+        stocksfile >> stocks;
+        stocksfile.close();
+    }
+    else{
+        std::cerr << "Failed to open stocks file" << std::endl;
+        exit(1);
+    }
+
+    try{
+        db_.executeQuery(deleteStocksSql);
+    }
+    catch(const std::exception& e){
+        std::cerr << e.what() << std::endl;
+        exit(1);
+    }
+
+    std::cout << stocks.serialize() << std::endl;
+    for (int i = 0; i < stocks.size(); i++){
+        std::string company = stocks[i][U("company")].as_string();
+        double price = stocks[i][U("price")].as_double();
+        int remainingShares = stocks[i][U("remainingShares")].as_integer();
+        double percentPerSell = stocks[i][U("percentPerSell")].as_double();
+        double percentPerBuy = stocks[i][U("percentPerBuy")].as_double();
+
+        std::string sqlQuery = "INSERT INTO stockmarket.stocks (company, price, remainingShares, percentPerSell, percentPerBuy) VALUES ('" + company + "', " + std::to_string(price) + ", " + std::to_string(remainingShares) + ", " + std::to_string(percentPerSell) + ", " + std::to_string(percentPerBuy) + ")";
+        try{
+            db_.executeQuery(sqlQuery);
+        }
+        catch(const std::exception& e){
+            std::cerr << e.what() << std::endl;
+            exit(1);
+        }
+    }
+
 }
 
 void StockService::start() {

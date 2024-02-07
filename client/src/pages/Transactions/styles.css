@@ -31,7 +31,8 @@
 }
 .transactions-container {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
+    /* flex-wrap: wrap; */
     gap: 0.4rem;
     align-items: start;
     justify-content: center;

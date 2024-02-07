@@ -26,6 +26,7 @@ export default function Stocks() {
                         setStocks(evt["data"]["stocks"]);
                     }
                     else if (evt["fun"] == "buystock"){
+                        console.log("I SEE YOU BUYING STOCK")
                         //set className of message box to display message for 1.5 seconds
                         let messageBox = document.getElementById('message-box');
                         messageBox.classList.add(evt["status"]);
@@ -115,9 +116,6 @@ export default function Stocks() {
                     <>
                     <div className="stockpage-wrapper">
                         <h2>View and purchase stocks here! With <span className="highlight">real-time</span> stock price updates, monitor the market and make <span className="highlight"> informed decisions. </span></h2>
-                        <div id="message-box" className="no-message" >
-                            {message}
-                        </div>
                         <div className='stocks-container'>
                             {stocks.length > 0 ?
                                 stocks.map((stock, index) => {

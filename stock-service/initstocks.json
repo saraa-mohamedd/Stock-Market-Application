@@ -1,0 +1,85 @@
+[ {
+    "company": "AAPL",
+    "price": 249.6,
+    "remainingShares": 10,
+    "percentPerSell": 1.2,
+    "percentPerBuy": 1.8
+},
+{
+    "company": "GOOGL",
+    "price": 1250.6,
+    "remainingShares": 110,
+    "percentPerSell": 2.8,
+    "percentPerBuy": 1.1
+},
+{
+    "company": "AMZN",
+    "price": 1800.6,
+    "remainingShares": 10,
+    "percentPerSell": 1.2,
+    "percentPerBuy": 1.8
+},
+{
+    "company": "MSFT",
+    "price": 140.6,
+    "remainingShares": 10,
+    "percentPerSell": 1.2,
+    "percentPerBuy": 1.8
+},
+{
+    "company": "TSLA",
+    "price": 250.6,
+    "remainingShares": 10,
+    "percentPerSell": 1.2,
+    "percentPerBuy": 1.8
+},
+{
+    "company": "FB",
+    "price": 250.6,
+    "remainingShares": 10,
+    "percentPerSell": 1.2,
+    "percentPerBuy": 1.8
+},
+{
+    "company": "NFLX",
+    "price": 250.6,
+    "remainingShares": 10,
+    "percentPerSell": 1.2,
+    "percentPerBuy": 1.8
+},
+{
+    "company": "BABA",
+    "price": 250.6,
+    "remainingShares": 10,
+    "percentPerSell": 1.2,
+    "percentPerBuy": 1.8
+},
+{
+    "company": "V",
+    "price": 250.6,
+    "remainingShares": 10,
+    "percentPerSell": 1.2,
+    "percentPerBuy": 1.8
+},
+{
+    "company": "JPM",
+    "price": 250.6,
+    "remainingShares": 10,
+    "percentPerSell": 1.2,
+    "percentPerBuy": 1.8
+},
+{
+    "company": "WMT",
+    "price": 250.6,
+    "remainingShares": 10,
+    "percentPerSell": 1.2,
+    "percentPerBuy": 1.8
+},
+{
+    "company": "PG",
+    "price": 250.6,
+    "remainingShares": 10,
+    "percentPerSell": 1.2,
+    "percentPerBuy": 1.8
+}
+]

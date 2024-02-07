@@ -6,7 +6,7 @@
     justify-content: start;
     height: auto;
     /* background-color: #f5f5f5; */
-    padding: 1rem 2rem;
+    padding: 1rem 20rem;
     /* background-color: aqua; */
 }
 
@@ -46,7 +46,7 @@
     justify-content: center;
     height: auto;
     /* width: 100%; */
-    padding: 3rem 2rem;
+    padding: 10rem 20rem;
 }
 
 #message-box{
@@ -57,18 +57,4 @@
     padding: 1rem 2rem;
     margin: 1rem 1rem;
     font-weight: 200;
-}
-
-.success {
-    background-color: #b6eca9;
-    border: 2px solid #4caf50;
-}
-
-.error {
-    background-color: #f8d7da;
-    border: 2px solid #e2959d;
-}
-
-.no-message{
-    display: none;
 }

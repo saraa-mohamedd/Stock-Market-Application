@@ -4,12 +4,52 @@ import { useAuth } from '../../context/AuthContext';
 import { useEffect, useRef, useState } from 'react';
 import { useServer } from '../../context/ServerContext';
 import { AreaChart, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Area} from 'recharts';
+import ApexChart from 'react-apexcharts';
+import Chart from 'react-apexcharts';
 
 export default function StockCard(props) {
     const {token} = useAuth();
     const {ws, connected} = useServer();
     const [prices, setPrices] = useState([]);
-    const chartRef = useRef();
+
+    const series =[
+        {
+            name: "Price",
+            data: prices.map(p => p.price)
+        }
+    ]
+
+    const options = {
+        chart: {
+            id: "basic-bar",
+            type: "line",
+            animation: {
+                enabled: true,
+                easing: 'linear',
+                dynamicAnimation: {
+                    speed: 1000
+                }
+            },
+            toolbar: {
+                show: false
+            }
+        },
+        dataLabels: {
+            enabled: false
+        },
+        stroke: {
+            curve: 'straight',
+            colors: ['#0f52ba'],
+            width: 3,
+        },
+        xaxis: {
+            categories: prices.map(p => p.x)
+        },
+        fill: {
+            colors: ['#0f52ba']
+          }
+
+    }
 
     useEffect(() => {
         if (props.prices.length > 20){
@@ -18,7 +58,6 @@ export default function StockCard(props) {
             }
         }
         setPrices(props.prices);
-        console.log("stock card prices: ", props.prices);
     }, [props.prices.length]);
 
     const handleBuy = () => {
@@ -30,7 +69,7 @@ export default function StockCard(props) {
                 "price": props.prices[props.prices.length - 1].price
             }
         }
-        console.log('request: ', request);
+        console.log('buy   request: ', request);
         if (ws && connected)
             ws.send(JSON.stringify(request));
     }
@@ -72,29 +111,12 @@ export default function StockCard(props) {
         <div className="stockCard">
             <div className="text">
                 <h1>{props.name}</h1>
-                <AreaChart width={350} height={300} data={prices} key={`ls_${props.prices.length}`}
-                >
-                    <defs>
-                        <linearGradient id="fillGradient" x1="0" y1="-1" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#002349" stopOpacity={1} />
-                            <stop offset="95%" stopColor="#FFFFFF" stopOpacity={1} />
-                        </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="5 5" />
-                    <XAxis dataKey="x"/>
-                    <YAxis tick={false} width={1}/>  
-                    <Tooltip />
-                    <Area
-                        type="natural"
-                        dataKey="price"
-                        isAnimationActive={true}
-                        animationDuration={0.01}
-                        stroke="#002349"
-                        strokeWidth={4}
-                        fill="url(#fillGradient)"
-                        dot={false}
-                    />
-                </AreaChart>
+                <Chart
+                    options={options}
+                    series={series}
+                    type="area"
+                    width={350}
+                    height={300}></Chart>
                 <ul>
                     <li><span className="label">Price:</span> ${props.prices.length > 0 ? props.prices[props.prices.length - 1].price : 0}</li>
                     <li><span className='label'>Shares:</span> {props.shares}</li>

@@ -39,6 +39,7 @@ class Server {
         json::value sellStock(json::value selldetails);
         json::value getUserStocks(json::value email);
         json::value getUserTransactions(json::value email);
+        
     public:
         Server();
         void start(uint16_t port);
