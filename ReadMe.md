@@ -2,7 +2,7 @@ This is the main read me for the stock market application. This application revo
 
 Reading the documentation files in the "docs" directory is *highly recommended* to get a good understanding of the system before diving in. Class diagrams for separate components are available in their respective documentation files, and a full system architecture diagram is modeled as follows
 
-![](ArchitectureDiagram.png)
+![](./Documentation/assets/ArchitectureDiagram.png)
 
 ---
 # Features
