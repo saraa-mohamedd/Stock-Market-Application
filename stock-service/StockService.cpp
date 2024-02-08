@@ -16,7 +16,7 @@ StockService::StockService() : listener_(uri(U("http://localhost:8080"))), db_("
     // queries to delete all stocks, user_stocks and user_transactions from the database
     std::string deleteStocksSql = "DELETE FROM stockmarket.stocks";
     std::string deleteUserStocksSql = "DELETE FROM stockmarket.user_stocks";
-    std::string deleteUserTransactionsSql = "DELETE FROM stockmarket.user_transactions";
+    std::string deleteUserTransactionsSql = "DELETE FROM stockmarket.transactions";
 
     // read stocks from initstocks.json
     std::ifstream stocksfile;
