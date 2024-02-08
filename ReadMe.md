@@ -1,6 +1,8 @@
+# Stock Market Application
+
 This is the main read me for the stock market application. This application revolves around three main components - a client GUI implemented using React JS, a server communicating with the client using TCP ports (websocket) implemented using C++, and a stock manager that interacts with the server using REST APIs, also implemented using C++.
 
-Reading the documentation files in the "docs" directory is *highly recommended* to get a good understanding of the system before diving in. Class diagrams for separate components are available in their respective documentation files, and a full system architecture diagram is modeled as follows
+Reading the documentation files in the "docs" directory is *highly recommended* to get a good understanding of the system before diving in. View the repository for this project ![here](https://github.com/saraa-mohamedd/Stock-Market-Application). Class diagrams for separate components are available in their respective documentation files, and a full system architecture diagram is modeled as follows
 
 ![](./Documentation/assets/ArchitectureDiagram.png)
 
