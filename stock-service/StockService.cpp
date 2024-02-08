@@ -45,7 +45,6 @@ StockService::StockService() : listener_(uri(U("http://localhost:8080"))), db_("
     }
 
     // insert stocks into the database
-    std::cout << stocks.serialize() << std::endl;
     for (int i = 0; i < stocks.size(); i++){
         std::string company = stocks[i][U("company")].as_string();
         double price = stocks[i][U("price")].as_double();
