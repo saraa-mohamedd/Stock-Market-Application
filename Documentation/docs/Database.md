@@ -43,8 +43,3 @@ Every entry in this table represents a single transaction, and has the following
 - **price**: DOUBLE; represents the price of the share at the time of transaction, e.g. 1876.4
 - **datetime**: DATETIME; represents the time and date the transaction took place, e.g. "2024-02-06 12:13:11"
 
----
-
-These entities and relationships can be seen in the following ER diagram:
-
-![](ERD.png)
