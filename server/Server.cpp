@@ -305,11 +305,8 @@ json::value Server::buyStock(json::value buydetails){
         response[U("fun")] = json::value::string("buystock");
         return response;
     }
-    //edit price string to remove the quotations around it
-    std::string pricestr = buydetails.at("data").at("price").as_string().substr(1, buydetails.at("data").at("price").as_string().length()-2);
-
     //log transaction in database
-    std::string query = "INSERT INTO stockmarket.transactions (email, type, stockCompany, price, datetime) VALUES ('" + buydetails.at("data").at("email").as_string() + "', 'buy', '" + buydetails.at("data").at("company").as_string() + "', " + pricestr + ", now())";
+    std::string query = "INSERT INTO stockmarket.transactions (email, type, stockCompany, price, datetime) VALUES ('" + buydetails.at("data").at("email").as_string() + "', 'buy', '" + buydetails.at("data").at("company").as_string() + "', " + buydetails.at("data").at("price").as_string() + ", now())";
 
     try{
         db_.executeQuery(query);
@@ -354,11 +351,9 @@ json::value Server::sellStock(json::value selldetails){
 
         return response;
     }
-    //edit price string to remove the quotations around it
-    std::string pricestr = selldetails.at("data").at("price").as_string().substr(1, selldetails.at("data").at("price").as_string().length()-2);
     
     //log transaction in database
-    std::string query = "INSERT INTO stockmarket.transactions (email, type, stockCompany, price, datetime) VALUES ('" + selldetails.at("data").at("email").as_string() + "', 'sell', '" + selldetails.at("data").at("company").as_string() + "', " + pricestr +  ", now())";
+    std::string query = "INSERT INTO stockmarket.transactions (email, type, stockCompany, price, datetime) VALUES ('" + selldetails.at("data").at("email").as_string() + "', 'sell', '" + selldetails.at("data").at("company").as_string() + "', " + selldetails.at("data").at("price").as_string() +  ", now())";
     std::cout << "here";
     try{
         db_.executeQuery(query);

@@ -5,7 +5,6 @@ import { useServer, ProvideServer } from '../../context/ServerContext.js';
 import { useEffect, useState, React } from 'react';
 import TransactionCard from '../../components/TransactionCard/TransactionCard.js'
 import UserLogin from '../../components/UserLogin/UserLogin.js';
-import ReactLoading from 'react-loading';
 
 export default function Wallet() {
     const { token } = useAuth();
@@ -60,14 +59,12 @@ export default function Wallet() {
     return (
         <ProvideAuth>
             <ProvideServer>
+                <div className="transactionpage-wrapper">
                 {transactions.length == 0 ?  
-                    <div className="transactionpage-wrapper">
-                        <div className='loading-text'>Loading your transactions...</div>
-                        <ReactLoading type={'balls'} color={"#002349"} height={'10rem'} width={'15rem'} />
-                    </div>
+                    <div className='loading-text'>
+                    You have made no transactions. <br/> <span className="highlight">Buy or sell stocks to see them here!</span> </div>
                     :
                     <>
-                    <div className="transactionpage-wrapper">
                         <h2>View your past transactions here!</h2>
                         <div className='transactions-container'>
                             {transactions.map((transaction, index) => {
@@ -79,9 +76,9 @@ export default function Wallet() {
                                     </ProvideAuth>
                                 )
                             })}
+                    </div>
+                    </>}
                         </div>
-                    </div></>
-                }
             </ProvideServer>
         </ProvideAuth>
     )
